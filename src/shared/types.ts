@@ -66,6 +66,13 @@ export interface GameCard {
 }
 
 // ============ Game Types ============
+
+export enum GameState {
+  LOBBY = "lobby",
+  ACTIVE = "active",
+  COMPLETED = "completed",
+}
+
 export type GameUser = {
   id: number;
   game_id: number;
@@ -77,12 +84,17 @@ export type GameUser = {
 
 export type Game = {
   id: number;
-  status: boolean; // true = active, false = completed
-  player_turn: number; // Current player user_id
-  is_clockwise: boolean;
-  last_card_played?: number; // Card ID
+  state: GameState; 
+  
+  name?: string;
+  created_by: number;
+  max_players: number;
+  
+  current_turn_user_id?: number;
+  is_clockwise?: boolean;
+  last_card_played?: number;
+  
   created_at: Date;
-  updated_at: Date;
   players?: GameUser[];
 };
 
