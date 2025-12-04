@@ -1,0 +1,8 @@
+node_modules/
+dist/
+logs/
+.env
+src/backend/public/js/
+
+# Teaching/livecoding guides
+*.livecoding.md
