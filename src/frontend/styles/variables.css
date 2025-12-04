@@ -1,16 +1,16 @@
 /* ==================== CSS VARIABLES ==================== */
 :root {
   /* Colors */
-  --color-primary: #3b82f6;
-  --color-secondary: #64748b;
-  --color-success: #22c55e;
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
+  --color-uno-red: #ff5555;
+  --color-uno-blue: #5555ff;
+  --color-uno-green: #55aa55;
+  --color-uno-yellow: #ffaa00;
+  --color-uno-black: #000000;
 
-  /* Neutral colors - warm beige theme */
-  --color-background: #f5f1e8;
-  --color-surface: #faf8f3;
-  --color-border: #e8e3d6;
+  /* Neutral colors - uno theme */
+  --color-background: #8b0000;
+  --color-surface: #ffffff;
+  --color-border: #cccccc;
 
   /* Text colors */
   --color-text-primary: #2c2415;
@@ -18,7 +18,7 @@
   --color-text-muted: #8b8375;
 
   /* State colors */
-  --state-active-bg: rgba(34, 197, 94, 0.1);
+  --state-active-bg: rgba(255, 204, 0, 0.18);
 
   /* Spacing scale */
   --spacing-xs: 0.25rem;
@@ -28,10 +28,10 @@
   --spacing-xl: 2rem;
 
   /* Border radius */
-  --border-radius: 8px;
+  --border-radius: 12px;
 
   /* Shadows */
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
 
   /* Transitions */
   --transition: 0.2s ease-in-out;
