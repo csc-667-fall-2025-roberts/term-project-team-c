@@ -1,60 +1,84 @@
 /* ==================== PLAYING CARDS ==================== */
 
 .playing-card {
-  width: 60px;
-  height: 84px;
+  width: 64px;
+  height: 96px;
   border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 1.25rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 2px solid rgba(0, 0, 0, 0.2); /* Darker, more visible border */
-  transition: transform var(--transition);
+  font-weight: 800;
+  font-size: 1.35rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45); /* a bit deeper for UNO drama */
+  border: 3px solid var(--color-uno-black);
+  transition: transform var(--transition), box-shadow var(--transition);
   position: relative;
+  background: #ffffff;
+  color: var(--color-text-primary);
+  overflow: hidden;
 }
 
 /* No general hover effect - only on player's hand */
 
-/* Card backs - fish themed with subtle animated shimmer */
+/* Card backs - UNO card back */
 .playing-card.back {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 40%, #2563eb 60%, #1e40af 100%);
-  background-size: 200% 200%;
-  animation: shimmer 8s ease-in-out infinite; /* Slower, more subtle */
+  background: radial-gradient(circle at 30% 20%, #ffffff 0%, #ffffff 15%, transparent 35%),
+              linear-gradient(
+                135deg,
+                var(--color-uno-red) 0%,
+                var(--color-uno-yellow) 25%,
+                var(--color-uno-green) 50%,
+                var(--color-uno-blue) 75%,
+                var(--color-uno-black) 100%
+              );
+  background-size: 260% 260%;
+  animation: shimmer 6s ease-in-out infinite;
   overflow: hidden;
-  border-color: rgba(255, 255, 255, 0.4); /* Light border for dark background */
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
 .playing-card.back::before {
   content: "";
   position: absolute;
-  inset: 4px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  inset: 6px;
+  border: 10px solid rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.4);
 }
 
 .playing-card.back::after {
-  content: "🐟";
-  font-size: 2rem;
+  content: "UNO";
+  font-size: 1.9rem;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  animation: float 4s ease-in-out infinite; /* Slower float */
+  transform: translate(-50%, -50%) rotate(-18deg);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: white;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+  animation: float 4s ease-in-out infinite;
 }
 
 /* Card suit colors - class names match DB values (H, D, C, S) */
-.playing-card.suit-H,
-.playing-card.suit-D {
-  background: white;
-  color: #dc2626; /* Deeper red for better contrast */
+/* Mapping to UNO colors: H = Red, D = Yellow, C = Green, S = Blue */
+.playing-card.suit-H {
+  background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-red) 48%, #8b0000 100%);
+  color: var(--color-uno-red);
 }
 
-.playing-card.suit-C,
+.playing-card.suit-D {
+  background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-yellow) 48%, #b45309 100%);
+  color: var(--color-uno-yellow);
+}
+
+.playing-card.suit-C {
+  background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-green) 48%, #065f46 100%);
+  color: var(--color-uno-green);
+}
+
 .playing-card.suit-S {
-  background: white;
-  color: #1e293b; /* Dark blue-gray for black suits */
+  background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-blue) 48%, #1e3a8a 100%);
+  color: var(--color-uno-blue);
 }
 
 /* Rank and suit positioning */
@@ -63,71 +87,55 @@
   position: absolute;
 }
 
+/* ::before = UNO-style inner oval ring (no text) */
 .playing-card::before {
-  top: 4px;
-  left: 6px;
-  font-size: 0.9rem;
-  line-height: 1;
+  content: "";
+  inset: 6px;
+  border-radius: 999px;
+  border: 3px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.35);
 }
 
+/* ::after = centered primary symbol/number only */
 .playing-card::after {
-  bottom: 4px;
-  right: 6px;
-  font-size: 1.5rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  
+  font-size: 2.1rem;
   line-height: 1;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.35);    /* <- slightly softer */
 }
-
-/* Rank symbols */
-.playing-card.rank-A::before { content: "A"; }
-.playing-card.rank-2::before { content: "2"; }
-.playing-card.rank-3::before { content: "3"; }
-.playing-card.rank-4::before { content: "4"; }
-.playing-card.rank-5::before { content: "5"; }
-.playing-card.rank-6::before { content: "6"; }
-.playing-card.rank-7::before { content: "7"; }
-.playing-card.rank-8::before { content: "8"; }
-.playing-card.rank-9::before { content: "9"; }
-.playing-card.rank-10::before { content: "10"; }
-.playing-card.rank-J::before { content: "J"; }
-.playing-card.rank-Q::before { content: "Q"; }
-.playing-card.rank-K::before { content: "K"; }
-
-/* Suit symbols - class names match DB values (H, D, C, S) */
-.playing-card.suit-H::after { content: "♥"; }
-.playing-card.suit-D::after { content: "♦"; }
-.playing-card.suit-C::after { content: "♣"; }
-.playing-card.suit-S::after { content: "♠"; }
 
 /* ==================== CARD INTERACTION STATES ==================== */
 
 /* Interactive player hand cards */
 .player-hand .playing-card {
   cursor: pointer;
-  transition: all var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .player-hand .playing-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px) rotate(-3deg);
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.55);
 }
 
 /* Selected card - gold/amber border for visibility */
 .player-hand .playing-card.selected {
-  transform: translateY(-12px);
-  box-shadow: 0 6px 12px rgba(251, 191, 36, 0.4);
-  border-color: #f59e0b; /* Amber/gold border - highly visible */
-  /* Keep border width consistent to avoid layout shift */
+  transform: translateY(-12px) rotate(-4deg);
+  box-shadow: 0 18px 32px rgba(251, 191, 36, 0.6);
+  border-color: var(--color-uno-yellow);
 }
 
 /* Opponent card hands - overlapping */
 .opponent-hand {
   display: flex;
   margin-bottom: var(--spacing-xs);
-  height: 84px;
+  height: 96px;
 }
 
 .opponent-hand .playing-card {
-  margin-left: -45px; /* Overlap cards */
+  margin-left: -48px; /* Overlap cards */
 }
 
 .opponent-hand .playing-card:first-child {
@@ -160,4 +168,65 @@
 /* Go Fish animation - didn't get cards */
 .playing-card.go-fish {
   animation: goFish 0.5s ease-in-out;
+}
+
+/* ==================== UNO VALUE & ACTION LABELS ==================== */
+/* These override the corner and big symbol using ::before / ::after */
+
+/* Number cards 0–9 (center only) */
+.playing-card.value-0::after { content: "0"; }
+.playing-card.value-1::after { content: "1"; }
+.playing-card.value-2::after { content: "2"; }
+.playing-card.value-3::after { content: "3"; }
+.playing-card.value-4::after { content: "4"; }
+.playing-card.value-5::after { content: "5"; }
+.playing-card.value-6::after { content: "6"; }
+.playing-card.value-7::after { content: "7"; }
+.playing-card.value-8::after { content: "8"; }
+.playing-card.value-9::after { content: "9"; }
+
+/* Action cards: Skip, Reverse, Draw 2 */
+.playing-card.value-skip::after {
+  content: "⦻";
+}
+
+.playing-card.value-reverse::after {
+  content: "↺↻";
+}
+
+.playing-card.value-draw2::after {
+  content: "+2";
+}
+
+/* Wild cards */
+.playing-card.value-wild,
+.playing-card.value-wild4 {
+  background:
+    radial-gradient(circle at 20% 20%, #ffffff 0%, #ffffff 18%, transparent 40%),
+    linear-gradient(
+      135deg,
+      var(--color-uno-red) 0%,
+      var(--color-uno-yellow) 25%,
+      var(--color-uno-green) 50%,
+      var(--color-uno-blue) 75%
+    );
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.playing-card.value-wild::after {
+  content: "WILD";
+}
+
+.playing-card.value-wild4::after {
+  content: "+4";
+}
+
+/* Make center symbol bigger for action/wild cards */
+.playing-card.value-skip::after,
+.playing-card.value-reverse::after,
+.playing-card.value-draw2::after,
+.playing-card.value-wild::after,
+.playing-card.value-wild4::after {
+  font-size: 1.9rem;
 }

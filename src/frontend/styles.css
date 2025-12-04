@@ -931,37 +931,25 @@ h2 {
 }
 
 /* Card suits/ranks - class names match DB values (H, D, C, S) */
-.playing-card.suit-H,
+.playing-card.suit-H {
+  background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-red) 48%, #8b0000 100%);
+  color: var(--color-uno-red);
+}
+
 .playing-card.suit-D {
-  background: white;
-  color: #e74c3c;
+  background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-yellow) 48%, #b45309 100%);
+  color: var(--color-uno-yellow);
 }
 
-.playing-card.suit-C,
+.playing-card.suit-C {
+  background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-green) 48%, #065f46 100%);
+  color: var(--color-uno-green);
+}
+
 .playing-card.suit-S {
-  background: white;
-  color: #2c3e50;
+  background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-blue) 48%, #1e3a8a 100%);
+  color: var(--color-uno-blue);
 }
-
-.playing-card.rank-A::before { content: "A"; }
-.playing-card.rank-2::before { content: "2"; }
-.playing-card.rank-3::before { content: "3"; }
-.playing-card.rank-4::before { content: "4"; }
-.playing-card.rank-5::before { content: "5"; }
-.playing-card.rank-6::before { content: "6"; }
-.playing-card.rank-7::before { content: "7"; }
-.playing-card.rank-8::before { content: "8"; }
-.playing-card.rank-9::before { content: "9"; }
-.playing-card.rank-10::before { content: "10"; }
-.playing-card.rank-J::before { content: "J"; }
-.playing-card.rank-Q::before { content: "Q"; }
-.playing-card.rank-K::before { content: "K"; }
-
-/* Suit symbols - class names match DB values (H, D, C, S) */
-.playing-card.suit-H::after { content: "♥"; }
-.playing-card.suit-D::after { content: "♦"; }
-.playing-card.suit-C::after { content: "♣"; }
-.playing-card.suit-S::after { content: "♠"; }
 
 .playing-card::before,
 .playing-card::after {

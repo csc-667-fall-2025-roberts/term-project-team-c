@@ -146,12 +146,11 @@
             <div class="player-hand">
               <% if (typeof myCards === 'undefined') { %>
                 <!-- PLACEHOLDER: Remove this if block after Session 1 wires up myCards -->
-                <div class="playing-card suit-H rank-A" data-rank="A"></div>
-                <div class="playing-card suit-D rank-5" data-rank="5"></div>
-                <div class="playing-card suit-C rank-5" data-rank="5"></div>
-                <div class="playing-card suit-S rank-J" data-rank="J"></div>
-                <div class="playing-card suit-H rank-Q" data-rank="Q"></div>
-                <div class="playing-card suit-D rank-2" data-rank="2"></div>
+                <div class="playing-card suit-H value-5"></div>
+                <div class="playing-card suit-S value-reverse"></div>
+                <div class="playing-card suit-C value-draw2"></div>
+                <div class="playing-card value-wild"></div>
+                <div class="playing-card value-wild4"></div>
               <% } else { %>
                 <!-- Real cards from data (empty if no cards yet) -->
                 <% myCards.forEach(card => { %>
