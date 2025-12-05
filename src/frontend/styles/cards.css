@@ -61,24 +61,31 @@
 
 /* Card suit colors - class names match DB values (H, D, C, S) */
 /* Mapping to UNO colors: H = Red, D = Yellow, C = Green, S = Blue */
-.playing-card.suit-H {
+.playing-card.red {
   background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-red) 48%, #8b0000 100%);
   color: var(--color-uno-red);
 }
 
-.playing-card.suit-D {
+.playing-card.yellow {
   background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-yellow) 48%, #b45309 100%);
   color: var(--color-uno-yellow);
 }
 
-.playing-card.suit-C {
+.playing-card.green {
   background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-green) 48%, #065f46 100%);
   color: var(--color-uno-green);
 }
 
-.playing-card.suit-S {
+.playing-card.blue {
   background: radial-gradient(circle at center, #ffffff 40%, var(--color-uno-blue) 48%, #1e3a8a 100%);
   color: var(--color-uno-blue);
+}
+
+.playing-card.black {
+  background: radial-gradient(circle at 20% 20%, #ffffff 0%, #ffffff 18%, transparent 40%),
+              linear-gradient(135deg, var(--color-uno-red) 0%, var(--color-uno-yellow) 25%, var(--color-uno-green) 50%, var(--color-uno-blue) 75%);
+  color: white;
+  border-color: white;
 }
 
 /* Rank and suit positioning */
