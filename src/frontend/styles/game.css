@@ -51,10 +51,10 @@ body.game-page {
 .game-page .game-layout {
   display: grid;
   flex: 1;
-  /* Columns: Left Opponent | Table Center | Right Opponent */
-  grid-template-columns: 280px 1fr 280px;
+  /* Columns: Left (Chat - Wider) | Table Center | Right Opponent */
+  grid-template-columns: 350px 1fr 280px;
   /* Rows: Top Opponent | Table Center | Player Hand */
-  grid-template-rows: 180px 1fr 240px;
+  grid-template-rows: 180px 1fr 180px;
   grid-template-areas:
     "top-left   top-center    top-right"
     "left-side  table-center  right-side"
@@ -95,7 +95,7 @@ body.game-page {
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-/* 5. Player Hand (Bottom) */
+/* 5. Player Hand (Bottom) - SHRUNK WIDTH */
 .game-page .player-area {
   grid-area: player-hand;
   display: flex;
@@ -103,13 +103,18 @@ body.game-page {
   justify-content: center;
   align-items: center;
   
-  /* THEME: Dark Felt Green (Matches Opponents) */
+  /* THEME: Dark Felt Green */
   background: radial-gradient(circle, #1a4c1a 0%, #0d260d 100%);
   border: 2px solid #2d6a2d;
   box-shadow: 0 4px 8px rgba(0,0,0,0.6);
   border-radius: 16px;
   
-  margin: 10px;
+  /* CONSTRAINT: This shrinks it "within the black lines" */
+  width: 100%;
+  max-width: 800px;
+  justify-self: center; /* Centers the shrunk box in the grid area */
+  
+  margin: 5px;
   padding: 10px;
 }
 
@@ -198,7 +203,7 @@ body.game-page {
   font-size: 0.85rem;
 }
 
-/* Side Hands (Compact & Rotated logic if needed, but currently stacked) */
+/* Compact Side Hands */
 .game-page .opponent-left .opponent-hand,
 .game-page .opponent-right .opponent-hand {
   display: flex;
@@ -236,7 +241,7 @@ body.game-page {
   flex: 1; 
   padding: 10px; 
   overflow-y: auto; 
-  background: transparent; /* Override global default */
+  background: transparent;
   border: none;
 }
 
@@ -247,7 +252,7 @@ body.game-page {
   margin-bottom: 6px;
   border-radius: 4px;
   font-size: 0.8rem;
-  border: none; /* Remove global border */
+  border: none;
   border-left: 3px solid var(--color-uno-yellow);
 }
 
@@ -281,6 +286,9 @@ body.game-page {
   box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
+/* ==================== GAME-SPECIFIC UI ELEMENTS ==================== */
+
+/* Override primary buttons inside the game room to match the table felt */
 .game-page .btn-primary {
   background: white;
   color: var(--color-uno-dark-green);
