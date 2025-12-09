@@ -62,8 +62,9 @@ export interface GameCard {
   user_id: number;
   card_id: number;
   card_order: number;
-  card?: Card; // Full card details when joined
 }
+
+export interface DisplayGameCard extends GameCard, Omit<Card, "id"> {}
 
 // ============ Game Types ============
 
@@ -84,16 +85,16 @@ export type GameUser = {
 
 export type Game = {
   id: number;
-  state: GameState; 
-  
+  state: GameState;
+
   name?: string;
   created_by: number;
   max_players: number;
-  
+
   current_turn_user_id?: number;
   is_clockwise?: boolean;
   last_card_played?: number;
-  
+
   created_at: Date;
   players?: GameUser[];
 };

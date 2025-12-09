@@ -1,35 +1,62 @@
-import { ColumnDefinitions, MigrationBuilder } from 'node-pg-migrate';
+import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate";
 
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   // Create color enum
-  pgm.createType('colors', ['blue', 'yellow', 'green', 'red', 'black']);
+  pgm.createType("colors", ["blue", "yellow", "green", "red", "black"]);
 
   // Create symbols enum
-  pgm.createType('symbols', [
-    'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
-    'skip', 'swap', 'plus_two', 'plus_four', 'wildcard',
+  pgm.createType("symbols", [
+    "zero",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "skip",
+    "swap",
+    "plus_two",
+    "plus_four",
+    "wildcard",
   ]);
 
   // Create cards table
-  pgm.createTable('cards', {
-    id: 'id',
+  pgm.createTable("cards", {
+    id: "id",
     card_symbol: {
-      type: 'symbols',
+      type: "symbols",
       notNull: true,
-      comment: 'Card symbol enum',
+      comment: "Card symbol enum",
     },
     card_color: {
-      type: 'colors',
+      type: "colors",
       notNull: true,
-      comment: 'Card color enum',
+      comment: "Card color enum",
     },
   });
 
   // Insert all valid card combinations
-  const colors = ['blue', 'yellow', 'green', 'red'];
-  const symbols = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'skip', 'swap', 'plus_two'];
+  const colors = ["blue", "yellow", "green", "red"];
+  const symbols = [
+    "zero",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "skip",
+    "swap",
+    "plus_two",
+  ];
 
   // Number and action cards (0-9, skip, swap, +2) in each color, 0 once per color, 1-9 and actions twice
   for (const color of colors) {
@@ -51,7 +78,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropTable('cards');
-  pgm.dropType('symbols');
-  pgm.dropType('colors');
+  pgm.dropTable("cards");
+  pgm.dropType("symbols");
+  pgm.dropType("colors");
 }
