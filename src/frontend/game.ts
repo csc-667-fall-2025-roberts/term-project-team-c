@@ -1,109 +1,123 @@
-/**
- * Game page interaction logic
- * Handles card selection and asking opponents for cards
- */
+import socketIo from "socket.io-client";
 
-// Track the currently selected card rank
-let selectedRank: string | null = null;
+import { GAME_UPDATED } from "@shared/keys";
+import { DisplayGameCard, User } from "@shared/types";
+// import "./styles/game.css";
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+const gameId = document.body.dataset.gameId || "";
+
+const socket = socketIo({ query: { gameId } });
+
+socket.on(
+  GAME_UPDATED,
+  (gameState: {
+    playerHands: Record<number, DisplayGameCard[]>;
+    currentPlayer: number;
+    players: User[];
+    topDiscardCard: DisplayGameCard[];
+  }) => {
+    console.log({ gameState });
+    // get the top discard card and render it into the "game-discard" div
+
+    // get the count of player cards and render the correct number of "playing-card-back" divs
+  },
+);
+
+// Track the currently selected card element
+let selectedCardElement: HTMLElement | null = null;
+
+document.addEventListener("DOMContentLoaded", () => {
   initializeCardSelection();
-  initializeOpponentInteraction();
+  initializeDrawPile();
+  initializeDiscardPile();
 });
 
 /**
- * Set up click handlers for player's cards
+ * 1. PLAYER HAND INTERACTION
+ * Allows selecting/deselecting cards in your hand
  */
 function initializeCardSelection() {
-  const playerCards = document.querySelectorAll('.player-hand .playing-card');
+  const playerCards = document.querySelectorAll(".player-hand .playing-card");
 
   playerCards.forEach((card) => {
-    card.addEventListener('click', () => {
-      const rank = card.getAttribute('data-rank');
+    card.addEventListener("click", () => {
+      const element = card as HTMLElement;
 
-      if (!rank) return;
+      // UNO CHANGE: Use data-value/color instead of rank/suit
+      const value = element.dataset.value;
+
+      if (!value) return;
 
       // Toggle selection
-      if (selectedRank === rank && card.classList.contains('selected')) {
-        // Deselect
+      if (element.classList.contains("selected")) {
         deselectCard();
       } else {
-        // Select this card, deselect others
-        selectCard(card as HTMLElement, rank);
+        selectCard(element);
       }
     });
   });
 }
 
-/**
- * Select a card and update UI state
- */
-function selectCard(cardElement: HTMLElement, rank: string) {
-  // Remove selection from all cards
-  const allCards = document.querySelectorAll('.player-hand .playing-card');
-  allCards.forEach(card => card.classList.remove('selected'));
-
-  // Select this card
-  cardElement.classList.add('selected');
-  selectedRank = rank;
-
-  // Make opponent cards clickable
-  const opponentCards = document.querySelectorAll('.opponent-card');
-  opponentCards.forEach(card => card.classList.add('clickable'));
-}
-
-/**
- * Deselect the current card and update UI state
- */
-function deselectCard() {
-  // Remove selection from all cards
-  const allCards = document.querySelectorAll('.player-hand .playing-card');
-  allCards.forEach(card => card.classList.remove('selected'));
-
-  selectedRank = null;
-
-  // Remove clickable state from opponent cards
-  const opponentCards = document.querySelectorAll('.opponent-card');
-  opponentCards.forEach(card => card.classList.remove('clickable'));
-}
-
-/**
- * Set up click handlers for opponent cards
- */
-function initializeOpponentInteraction() {
-  const opponentCards = document.querySelectorAll('.opponent-card');
-
-  opponentCards.forEach((opponentCard) => {
-    opponentCard.addEventListener('click', () => {
-      // Only handle clicks if a card is selected
-      if (!selectedRank || !opponentCard.classList.contains('clickable')) {
-        return;
-      }
-
-      // Get opponent player number from the badge class
-      const badge = opponentCard.querySelector('.book-badge');
-      const playerClasses = badge?.className.match(/player-(\d+)/);
-      const opponentPlayer = playerClasses ? playerClasses[1] : null;
-
-      if (opponentPlayer) {
-        handleAskForCards(opponentPlayer, selectedRank);
-      }
-    });
-  });
-}
-
-/**
- * Handle the "ask for cards" action
- * TODO: Replace with actual API call when backend is ready
- */
-function handleAskForCards(opponentPlayer: string, rank: string) {
-  console.log(`Asking Player ${opponentPlayer} for ${rank}s`);
-
-  // TODO: Make API call to backend
-  // For now, just show a temporary message
-  alert(`Asking Player ${opponentPlayer} for ${rank}s\n\n(This will be replaced with actual game logic)`);
-
-  // Clear selection
+function selectCard(cardElement: HTMLElement) {
+  // Deselect others first (you can only pick one card in Uno)
   deselectCard();
+
+  // Select this one
+  cardElement.classList.add("selected");
+  selectedCardElement = cardElement;
+
+  console.log("Selected:", cardElement.dataset.color, cardElement.dataset.value);
+}
+
+function deselectCard() {
+  if (!selectedCardElement) return;
+
+  selectedCardElement.classList.remove("selected");
+  selectedCardElement = null;
+}
+
+/**
+ * 2. DRAW PILE INTERACTION
+ * Handles clicking the deck to draw a card
+ */
+function initializeDrawPile() {
+  const drawPile = document.getElementById("draw-pile");
+
+  if (drawPile) {
+    drawPile.addEventListener("click", () => {
+      console.log("Action: Draw Card requested");
+
+      // Visual feedback
+      drawPile.classList.add("drawing");
+      setTimeout(() => drawPile.classList.remove("drawing"), 500);
+
+      // TODO: Emit socket event 'game:draw'
+    });
+  }
+}
+
+/**
+ * 3. DISCARD PILE INTERACTION
+ * Handles playing the selected card onto the pile
+ */
+function initializeDiscardPile() {
+  const discardPile = document.querySelector(".discard-pile");
+
+  if (discardPile) {
+    discardPile.addEventListener("click", () => {
+      if (selectedCardElement) {
+        const color = selectedCardElement.dataset.color;
+        const value = selectedCardElement.dataset.value;
+
+        console.log(`Action: Attempting to play ${color} ${value}`);
+
+        // TODO: Emit socket event 'game:play' with card ID
+
+        // Temporary visual cleanup for demo
+        deselectCard();
+      } else {
+        console.log("No card selected to play");
+      }
+    });
+  }
 }

@@ -1,48 +1,25 @@
 /* ==================== CSS VARIABLES ==================== */
 :root {
-  /* Colors */
+  /* Official Uno Colors */
   --color-uno-red: #ff5555;
   --color-uno-blue: #5555ff;
   --color-uno-green: #55aa55;
   --color-uno-yellow: #ffaa00;
-  --color-uno-black: #000000;
+  --color-uno-black: #1a1a1a;
+  --color-uno-dark-green: #1a4c1a;
 
-  /* Neutral colors - uno theme */
-  --color-background: #8b0000;
-  --color-surface: #ffffff;
-  --color-border: #cccccc;
-
-  /* Text colors */
-  --color-text-primary: #2c2415;
-  --color-text-secondary: #5c5444;
-  --color-text-muted: #8b8375;
-
-  /* State colors */
-  --state-active-bg: rgba(255, 204, 0, 0.18);
-
-  /* Spacing scale */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-
-  /* Border radius */
-  --border-radius: 12px;
-
-  /* Shadows */
-  --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
-
-  /* Transitions */
-  --transition: 0.2s ease-in-out;
-
-  /* Player colors for book tracking */
-  --player-1-color: #3b82f6; /* Blue */
-  --player-2-color: #ef4444; /* Red */
-  --player-3-color: #10b981; /* Green */
-  --player-4-color: #f59e0b; /* Amber */
-  --player-5-color: #8b5cf6; /* Purple */
-  --player-6-color: #ec4899; /* Pink */
-  --player-7-color: #06b6d4; /* Cyan */
-  --player-8-color: #84cc16; /* Lime */
+/* Table Theme */
+  --color-background: #f5f1e8; 
+  --color-table-felt: radial-gradient(circle at center, #a30000 0%, #600000 100%);
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  
+  /* Dimensions */
+  --card-width: 80px;
+  --card-height: 120px;
+  --border-radius: 10px;
+  
+  /* Effects */
+  --card-shadow: 2px 4px 8px rgba(0,0,0,0.5);
+  --inner-glow: inset 0 0 10px rgba(0,0,0,0.2);
 }
