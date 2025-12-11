@@ -1,10 +1,12 @@
 import express from "express";
 import { Server } from "socket.io";
 
-import { GAME_CREATE, GAME_LISTING } from "@shared/keys";
 import * as Games from "@backend/db/games";
 import { generateGameName } from "@backend/lib/game-names";
 import logger from "@backend/lib/logger";
+import * as GameService from "@backend/services/game-service";
+import { broadcastGameState } from "@backend/sockets/game-socket";
+import { GAME_CREATE, GAME_LISTING } from "@shared/keys";
 
 const router = express.Router();
 
@@ -18,9 +20,9 @@ router.get("/", async (request, response) => {
   const userGames = await Games.getByUser(userId);
 
   // Separate games into user's games and available games
-  const userGameIds = new Set(userGames.map(g => g.id));
-  const myGames = allGames.filter(g => userGameIds.has(g.id));
-  const availableGames = allGames.filter(g => !userGameIds.has(g.id));
+  const userGameIds = new Set(userGames.map((g) => g.id));
+  const myGames = allGames.filter((g) => userGameIds.has(g.id));
+  const availableGames = allGames.filter((g) => !userGameIds.has(g.id));
 
   const io = request.app.get("io") as Server;
 
@@ -70,6 +72,20 @@ router.post("/:game_id/join", async (request, response) => {
   await Games.join(parseInt(game_id), id);
 
   response.redirect(`/games/${game_id}`);
+});
+
+router.post("/:game_id/start", async (request, response) => {
+  const { game_id } = request.params;
+  const gameId = parseInt(game_id);
+
+  await GameService.start(gameId);
+
+  const state = await GameService.get(gameId);
+
+  // response.redirect(`/games/${gameId}`);
+
+  const io = request.app.get("io") as Server;
+  broadcastGameState(io, gameId, state);
 });
 
 export default router;

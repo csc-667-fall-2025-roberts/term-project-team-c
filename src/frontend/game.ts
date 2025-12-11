@@ -1,9 +1,27 @@
-/**
- * Game page interaction logic
- * Handles Uno card selection and gameplay
- */
+import socketIo from "socket.io-client";
 
-import "./styles/game.css"; // Ensure styles are loaded if using bundler
+import { GAME_UPDATED } from "@shared/keys";
+import { DisplayGameCard, User } from "@shared/types";
+// import "./styles/game.css";
+
+const gameId = document.body.dataset.gameId || "";
+
+const socket = socketIo({ query: { gameId } });
+
+socket.on(
+  GAME_UPDATED,
+  (gameState: {
+    playerHands: Record<number, DisplayGameCard[]>;
+    currentPlayer: number;
+    players: User[];
+    topDiscardCard: DisplayGameCard[];
+  }) => {
+    console.log({ gameState });
+    // get the top discard card and render it into the "game-discard" div
+
+    // get the count of player cards and render the correct number of "playing-card-back" divs
+  },
+);
 
 // Track the currently selected card element
 let selectedCardElement: HTMLElement | null = null;
@@ -24,10 +42,10 @@ function initializeCardSelection() {
   playerCards.forEach((card) => {
     card.addEventListener("click", () => {
       const element = card as HTMLElement;
-      
+
       // UNO CHANGE: Use data-value/color instead of rank/suit
       const value = element.dataset.value;
-      
+
       if (!value) return;
 
       // Toggle selection
@@ -48,16 +66,12 @@ function selectCard(cardElement: HTMLElement) {
   cardElement.classList.add("selected");
   selectedCardElement = cardElement;
 
-  console.log(
-    "Selected:", 
-    cardElement.dataset.color, 
-    cardElement.dataset.value
-  );
+  console.log("Selected:", cardElement.dataset.color, cardElement.dataset.value);
 }
 
 function deselectCard() {
   if (!selectedCardElement) return;
-  
+
   selectedCardElement.classList.remove("selected");
   selectedCardElement = null;
 }
@@ -68,11 +82,11 @@ function deselectCard() {
  */
 function initializeDrawPile() {
   const drawPile = document.getElementById("draw-pile");
-  
+
   if (drawPile) {
     drawPile.addEventListener("click", () => {
       console.log("Action: Draw Card requested");
-      
+
       // Visual feedback
       drawPile.classList.add("drawing");
       setTimeout(() => drawPile.classList.remove("drawing"), 500);
@@ -94,11 +108,11 @@ function initializeDiscardPile() {
       if (selectedCardElement) {
         const color = selectedCardElement.dataset.color;
         const value = selectedCardElement.dataset.value;
-        
+
         console.log(`Action: Attempting to play ${color} ${value}`);
-        
+
         // TODO: Emit socket event 'game:play' with card ID
-        
+
         // Temporary visual cleanup for demo
         deselectCard();
       } else {

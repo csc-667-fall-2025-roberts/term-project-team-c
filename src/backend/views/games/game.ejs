@@ -1,118 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Game <%= id %> - Uno</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="stylesheet" href="/css/bundle.css" />
-  <script type="module" src="/js/game.js" defer></script>
-  <script type="module" src="/js/dev-menu.js" defer></script>
-</head>
-<body class="game-page">
-  <div class="game-container">
-    <div class="game-header">
-      <h1>
-        <img src="/favicon.svg" class="site-logo" alt="Uno Logo">
-        <%= name || `Game ${id}` %>
-        <span class="game-meta-info">• <%= state %> • <%= max_players %> players</span>
-      </h1>
-      <a href="/lobby" style="color: white; text-decoration: none;">Exit Game</a>
-    </div>
-
-    <div class="game-layout">
-      
-      <div class="opponent-card opponent-top">
-        <div class="player-info">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Cpu" class="player-avatar"/>
-          <div style="text-align: center;">CPU (Top)</div>
-        </div>
-        <div class="opponent-hand">
-          <div class="playing-card back"></div>
-          <div class="playing-card back"></div>
-          <div class="playing-card back"></div>
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game <%= id %> - Uno</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/css/bundle.css" />
+    <script type="module" src="/js/game.js" defer></script>
+    <script type="module" src="/js/dev-menu.js" defer></script>
+  </head>
+  <body class="game-page" data-game-id="<%= id %>">
+    <div class="game-container">
+      <div class="game-header">
+        <h1>
+          <img src="/favicon.svg" class="site-logo" alt="Uno Logo" />
+          <%= name || `Game ${id}` %>
+          <span class="game-meta-info">• <%= state %> • <%= max_players %> players</span>
+        </h1>
+        <form method="post" action="/games/<%= id %>/start">
+          <button type="submit">Start Game (Placeholder)</button>
+        </form>
+        <a href="/lobby" style="color: white; text-decoration: none">Exit Game</a>
       </div>
 
-      <div class="opponent-card opponent-left">
-        <div class="player-info">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=P2" class="player-avatar"/>
-            <div>Player 2</div>
-        </div>
-        <div class="opponent-hand">
-          <div class="playing-card back"></div>
-          <div class="playing-card back" style="margin-top: -80px;"></div>
-          <div class="playing-card back" style="margin-top: -80px;"></div>
-        </div>
-      </div>
-
-      <div class="opponent-card opponent-right">
-        <div class="player-info">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=P3" class="player-avatar"/>
-            <div>Player 3</div>
-        </div>
-        <div class="opponent-hand">
-          <div class="playing-card back"></div>
-          <div class="playing-card back" style="margin-top: -80px;"></div>
-        </div>
-      </div>
-
-      <div class="center-game-area">
-        <div class="deck-section">
-          <h3>Draw</h3>
-          <div class="deck-pile" id="draw-pile">
+      <div class="game-layout">
+        <div class="opponent-card opponent-top">
+          <div class="player-info">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Cpu" class="player-avatar" />
+            <div style="text-align: center">CPU (Top)</div>
+          </div>
+          <div class="opponent-hand">
+            <div class="playing-card back"></div>
+            <div class="playing-card back"></div>
             <div class="playing-card back"></div>
           </div>
         </div>
 
-        <div class="discard-section" style="margin-left: 2rem;">
-          <h3>Discard</h3>
-          <div class="discard-pile">
-            <% if (typeof topCard !== 'undefined' && topCard) { %>
-               <div class="playing-card <%= topCard.card_color %>" data-value="<%= topCard.card_symbol %>"></div>
-            <% } else { %>
-               <div class="playing-card red" data-value="7"></div>
-            <% } %>
+        <div class="opponent-card opponent-left">
+          <div class="player-info">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=P2" class="player-avatar" />
+            <div>Player 2</div>
+          </div>
+          <div class="opponent-hand">
+            <div class="playing-card back"></div>
+            <div class="playing-card back" style="margin-top: -80px"></div>
+            <div class="playing-card back" style="margin-top: -80px"></div>
           </div>
         </div>
-      </div>
 
-      <div class="game-chat">
-        <div id="chat-area">
-          <div id="message-listing" class="message-listing">
-            <div class="chat-message system">
-              <span class="message-text">Welcome to Uno!</span>
+        <div class="opponent-card opponent-right">
+          <div class="player-info">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=P3" class="player-avatar" />
+            <div>Player 3</div>
+          </div>
+          <div class="opponent-hand">
+            <div class="playing-card back"></div>
+            <div class="playing-card back" style="margin-top: -80px"></div>
+          </div>
+        </div>
+
+        <div class="center-game-area">
+          <div class="deck-section">
+            <h3>Draw</h3>
+            <div class="deck-pile" id="draw-pile">
+              <div class="playing-card back"></div>
             </div>
           </div>
-          <div id="message-submit" class="message-submit" style="padding: 10px;">
-            <input type="text" placeholder="Chat..." />
-            <button class="btn-primary">Send</button>
+
+          <div class="discard-section" style="margin-left: 2rem">
+            <h3>Discard</h3>
+            <div class="discard-pile">
+              <% if (typeof topCard !== 'undefined' && topCard) { %>
+              <div
+                class="playing-card <%= topCard.card_color %>"
+                data-value="<%= topCard.card_symbol %>"
+              ></div>
+              <% } else { %>
+              <div class="playing-card red" data-value="7"></div>
+              <% } %>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="player-area">
-        <div class="player-hand">
-          <% if (typeof myCards === 'undefined' || myCards.length === 0) { %>
+        <div class="game-chat">
+          <div id="chat-area">
+            <div id="message-listing" class="message-listing">
+              <div class="chat-message system">
+                <span class="message-text">Welcome to Uno!</span>
+              </div>
+            </div>
+            <div id="message-submit" class="message-submit" style="padding: 10px">
+              <input type="text" placeholder="Chat..." />
+              <button class="btn-primary">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-area">
+          <div class="player-hand">
+            <% if (typeof myCards === 'undefined' || myCards.length === 0) { %>
             <div class="playing-card red" data-value="1"></div>
             <div class="playing-card blue" data-value="skip"></div>
             <div class="playing-card green" data-value="reverse"></div>
             <div class="playing-card yellow" data-value="draw2"></div>
             <div class="playing-card black" data-value="wild"></div>
-          <% } else { %>
+            <% } else { %>
             <% myCards.forEach(card => { %>
-              <div class="playing-card <%= card.card_color %>" data-value="<%= card.card_symbol %>"></div>
+            <div
+              class="playing-card <%= card.card_color %>"
+              data-value="<%= card.card_symbol %>"
+            ></div>
             <% }) %>
-          <% } %>
+            <% } %>
+          </div>
+          <h3 style="color: white; margin-top: 10px">Your Hand</h3>
         </div>
-        <h3 style="color: white; margin-top: 10px;">Your Hand</h3>
       </div>
-
     </div>
-  </div>
 
-  <template id="card-template">
-    <div class="playing-card"></div>
-  </template>
-</body>
+    <template id="card-template">
+      <div class="playing-card"></div>
+    </template>
+  </body>
 </html>
