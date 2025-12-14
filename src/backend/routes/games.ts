@@ -75,6 +75,7 @@ router.post("/:game_id/join", async (request, response) => {
 });
 
 router.post("/:game_id/start", async (request, response) => {
+	console.log("Starting the game");
   const { game_id } = request.params;
   const gameId = parseInt(game_id);
 
@@ -82,7 +83,7 @@ router.post("/:game_id/start", async (request, response) => {
 
   const state = await GameService.get(gameId);
 
-  // response.redirect(`/games/${gameId}`);
+  response.redirect(`/games/${gameId}`);
 
   const io = request.app.get("io") as Server;
   broadcastGameState(io, gameId, state);
