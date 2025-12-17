@@ -51,7 +51,17 @@
 #
 # }}-
 
-{pkgs ? import <nixpkgs> {}}:
+let
+  pkgs =
+    import
+      # The downloaded archive will be (temporarily?) housed in the Nix store
+      # e.g., "/nix/store/gk9x7syd0ic6hjrf0fs6y4bsd16zgscg-source"
+      # (Try any of the `fetchTarball` commands  below  in `nix repl`, and it
+      #  will print out the path.)
+      ( builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/refs/tags/25.11.tar.gz" )
+      { config = {}; overlays = []; }
+  ;
+in
 
 pkgs.mkShell {
 
