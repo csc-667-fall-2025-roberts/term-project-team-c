@@ -90,7 +90,7 @@ export type Game = {
   name?: string;
   created_by: number;
   max_players: number;
-	player_count: number;
+	//player_count: number;
 
   current_turn_user_id?: number;
   is_clockwise?: boolean;

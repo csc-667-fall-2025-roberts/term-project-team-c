@@ -3,6 +3,7 @@ dist/
 logs/
 .env
 src/backend/public/js/
+.nix-shell/
 
 # Teaching/livecoding guides
 *.livecoding.md
