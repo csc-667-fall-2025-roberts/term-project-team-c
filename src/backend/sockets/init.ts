@@ -14,24 +14,34 @@ export const initSockets = (httpServer: HTTPServer) => {
   io.engine.use(sessionMiddleware);
 
   io.on("connection", (socket) => {
-    // @ts-ignore
-    const session = socket.request.session as { id: string; user: User };
+  const session = (socket.request as any).session as
+    | { id?: string; user?: User }
+    | undefined;
 
-    logger.info(`socket for user ${session.user.username} established`);
+  if (!session || !session.user) {
+    logger.info(`unauthenticated socket connection: ${socket.id}`);
+    return;
+  }
 
+  logger.info(`socket for user ${session.user.username} established`);
+
+  if (session.id) {
     socket.join(session.id);
-    socket.join(GLOBAL_ROOM);
+  }
+  socket.join(GLOBAL_ROOM);
 
-    // Join game room if gameId provided
-    const gameId = socket.handshake.query.gameId as string;
-    if (gameId) {
-      initGameSocket(socket, parseInt(gameId), session.user.id);
+  const gameId = socket.handshake.query.gameId as string | undefined;
+  if (gameId) {
+    const id = parseInt(gameId, 10);
+    if (!Number.isNaN(id)) {
+      initGameSocket(socket, id, session.user.id);
     }
+  }
 
-    socket.on("close", () => {
-      logger.info(`socket for user ${session.user.username} closed`);
-    });
+  socket.on("close", () => {
+    logger.info(`socket for user ${session.user.username} closed`);
   });
+});
 
   return io;
 };
