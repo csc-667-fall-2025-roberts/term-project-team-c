@@ -303,3 +303,17 @@ body.game-page {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
+
+/* Dragging State */
+.playing-card.dragging {
+  cursor: grabbing;
+  transform: scale(1.1) rotate(5deg); /* Pop up and tilt slightly */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5); /* Big shadow to show depth */
+  pointer-events: none; /* Ignore mouse events on the card itself so we can detect what's underneath */
+}
+
+/* Ensure the discard pile is ready to receive drops */
+.discard-pile {
+  position: relative;
+  /* Add a border or glow here if you want to highlight the drop zone */
+}

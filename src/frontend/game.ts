@@ -1,5 +1,5 @@
 import socketIo from "socket.io-client";
-
+import { enableDragAndDrop } from "./drag-drop";
 import { GAME_UPDATED } from "@shared/keys";
 import { DisplayGameCard, User } from "@shared/types";
 // import "./styles/game.css";
@@ -40,20 +40,20 @@ function initializeCardSelection() {
   const playerCards = document.querySelectorAll(".player-hand .playing-card");
 
   playerCards.forEach((card) => {
-    card.addEventListener("click", () => {
-      const element = card as HTMLElement;
+    const element = card as HTMLElement;
+    
+    // We pass the card element, the drop zone selector, and the callback for a successful drop
+    enableDragAndDrop(element, ".discard-pile", (droppedCard) => {
+      const color = droppedCard.dataset.color;
+      const value = droppedCard.dataset.value;
 
-      // UNO CHANGE: Use data-value/color instead of rank/suit
-      const value = element.dataset.value;
+      console.log(`Action: Dragged & Dropped ${color} ${value}`);
 
-      if (!value) return;
+      // TODO: Emit socket event
+      // socket.emit('game:play', { cardId: ... });
 
-      // Toggle selection
-      if (element.classList.contains("selected")) {
-        deselectCard();
-      } else {
-        selectCard(element);
-      }
+      // Optional: Visual cleanup until server updates state
+      droppedCard.remove(); 
     });
   });
 }
