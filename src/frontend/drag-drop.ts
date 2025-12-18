@@ -1,10 +1,14 @@
 /**
- * Enables drag-and-drop by creating a temporary clone (ghost) of the card.
- * This prevents the card from disappearing behind other elements or messing up the hand layout.
+ * Enables drag-and-drop with "Ghost" elements.
+ * Supports:
+ * 1. Dropping on a target (Discard Pile) to play.
+ * 2. Dropping back on the container (Hand) to reorder.
+ * 3. Snapping back to original position if dropped elsewhere.
  */
 export function enableDragAndDrop(
   originalCard: HTMLElement,
   discardPileSelector: string,
+  handContainerSelector: string,
   onDropCallback: (card: HTMLElement) => void,
 ) {
   let isDragging = false;
@@ -17,35 +21,31 @@ export function enableDragAndDrop(
   originalCard.addEventListener("mousedown", startDrag);
 
   function startDrag(e: MouseEvent) {
-    if (e.button !== 0) return; // Only left click
+    if (e.button !== 0) return; // Left click only
     e.preventDefault();
 
     isDragging = true;
     startX = e.clientX;
     startY = e.clientY;
 
-    // 1. Get the original card's position
     const rect = originalCard.getBoundingClientRect();
     initialLeft = rect.left;
     initialTop = rect.top;
 
-    // 2. Create the "Ghost Card" (Clone)
+    // Create Ghost
     ghostCard = originalCard.cloneNode(true) as HTMLElement;
-    
-    // 3. Style the Ghost to look exactly like the moving card
     ghostCard.style.position = "absolute";
     ghostCard.style.left = `${initialLeft}px`;
     ghostCard.style.top = `${initialTop}px`;
     ghostCard.style.width = `${rect.width}px`;
     ghostCard.style.height = `${rect.height}px`;
-    ghostCard.style.zIndex = "9999"; // On top of EVERYTHING
-    ghostCard.style.pointerEvents = "none"; // Let mouse events pass through to check for drops
-    ghostCard.classList.add("dragging"); // Apply your CSS rotation/scale
+    ghostCard.style.zIndex = "9999";
+    ghostCard.style.pointerEvents = "none"; // Click-through
+    ghostCard.classList.add("dragging");
 
-    // 4. Add Ghost to Body (so it's not clipped by the game container)
     document.body.appendChild(ghostCard);
 
-    // 5. Hide the original card (but keep its space in the hand)
+    // Hide original (keeps the gap open)
     originalCard.style.opacity = "0";
 
     document.addEventListener("mousemove", drag);
@@ -54,10 +54,8 @@ export function enableDragAndDrop(
 
   function drag(e: MouseEvent) {
     if (!isDragging || !ghostCard) return;
-
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
-
     ghostCard.style.left = `${initialLeft + dx}px`;
     ghostCard.style.top = `${initialTop + dy}px`;
   }
@@ -66,14 +64,14 @@ export function enableDragAndDrop(
     if (!isDragging) return;
     isDragging = false;
 
-    // Clean up listeners
+    // Cleanup listeners
     document.removeEventListener("mousemove", drag);
     document.removeEventListener("mouseup", stopDrag);
 
-    // Check for drop on Discard Pile
-    const discardPile = document.querySelector(discardPileSelector);
-    let droppedSuccessfully = false;
+    let actionTaken = false;
 
+    // 1. CHECK DISCARD PILE (Play Card)
+    const discardPile = document.querySelector(discardPileSelector);
     if (discardPile && ghostCard) {
       const ghostRect = ghostCard.getBoundingClientRect();
       const pileRect = discardPile.getBoundingClientRect();
@@ -86,25 +84,71 @@ export function enableDragAndDrop(
         ghostRect.bottom > pileRect.top;
 
       if (overlap) {
-        droppedSuccessfully = true;
+        actionTaken = true;
         onDropCallback(originalCard);
       }
     }
 
-    // Cleanup
+    // 2. CHECK HAND (Reorder)
+    // Only if we didn't play the card
+    if (!actionTaken && ghostCard) {
+      const handContainer = document.querySelector(handContainerSelector);
+      const ghostRect = ghostCard.getBoundingClientRect();
+      
+      if (handContainer) {
+        const handRect = handContainer.getBoundingClientRect();
+
+        // Check if dropped roughly within the hand area
+        if (
+          ghostRect.top < handRect.bottom &&
+          ghostRect.bottom > handRect.top &&
+          ghostRect.left < handRect.right &&
+          ghostRect.right > handRect.left
+        ) {
+          // Find where to insert
+          const siblings = Array.from(handContainer.children) as HTMLElement[];
+          
+          // Filter out the ghost (if it somehow got in there) and the original card itself
+          // We want to compare against the OTHER cards to find the gap.
+          const targets = siblings.filter(el => 
+            el !== originalCard && 
+            el.classList.contains('playing-card') &&
+            !el.classList.contains('dragging')
+          );
+
+          let insertBeforeElement: HTMLElement | null = null;
+
+          for (const target of targets) {
+            const targetRect = target.getBoundingClientRect();
+            const targetCenter = targetRect.left + targetRect.width / 2;
+
+            // If mouse is to the left of this card's center, insert before it
+            if (e.clientX < targetCenter) {
+              insertBeforeElement = target;
+              break;
+            }
+          }
+
+          // Perform the move in the DOM
+          if (insertBeforeElement) {
+            handContainer.insertBefore(originalCard, insertBeforeElement);
+          } else {
+            // If no target found, append to end
+            handContainer.appendChild(originalCard);
+          }
+          actionTaken = true;
+        }
+      }
+    }
+
+    // 3. CLEANUP (Snap Back)
     if (ghostCard) {
       ghostCard.remove();
       ghostCard = null;
     }
-
-    // If NOT dropped, show the original card again
-    if (!droppedSuccessfully) {
-      originalCard.style.opacity = "1";
-    } else {
-      // If dropped, we might still want to reset opacity if the game logic 
-      // doesn't immediately remove it, but usually the callback handles it.
-      // For safety, we can reset it, or let the callback remove the element.
-      originalCard.style.opacity = "1"; 
-    }
+    // Always make original visible again. 
+    // If it was moved (reordered), it appears in new spot.
+    // If not moved (invalid drop), it appears in old spot.
+    originalCard.style.opacity = "1";
   }
 }

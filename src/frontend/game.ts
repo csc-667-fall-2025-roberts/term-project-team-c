@@ -42,8 +42,8 @@ function initializeCardSelection() {
   playerCards.forEach((card) => {
     const element = card as HTMLElement;
     
-    // We pass the card element, the drop zone selector, and the callback for a successful drop
-    enableDragAndDrop(element, ".discard-pile", (droppedCard) => {
+    // UPDATED: Added ".player-hand" as the 3rd argument
+    enableDragAndDrop(element, ".discard-pile", ".player-hand", (droppedCard) => {
       const color = droppedCard.dataset.color;
       const value = droppedCard.dataset.value;
 
@@ -51,8 +51,7 @@ function initializeCardSelection() {
 
       // TODO: Emit socket event
       // socket.emit('game:play', { cardId: ... });
-
-      // Optional: Visual cleanup until server updates state
+      
       droppedCard.remove(); 
     });
   });
