@@ -52,5 +52,17 @@ export const playCard = async (gameId: number, userId: number, cardId: number) =
 };
 
 export const drawCard = async (gameId: number, userId: number) => {
+  //Draw one card from the deck
+  const cards = await GameCards.drawCards(gameId, 1);
 
+  if (!cards || cards.length === 0) {
+    throw new Error("No cards left in deck");
+  }
+
+  const drawnCard = cards[0];
+
+  //Add the card to the player's hand
+  await GameCards.dealCards(gameId, userId, [drawnCard.id]);
+
+  return drawnCard;
 };
