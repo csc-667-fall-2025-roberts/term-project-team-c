@@ -46,3 +46,11 @@ export const get = async (gameId: number) => {
     // playDirection // not sure if this is stored anywhere currently
   };
 };
+
+export const playCard = async (gameId: number, userId: number, cardId: number) => {
+
+};
+
+export const drawCard = async (gameId: number, userId: number) => {
+
+};
