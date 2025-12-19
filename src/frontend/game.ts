@@ -17,17 +17,27 @@ socket.on(
   GAME_UPDATED,
   (gameState: {
     playerHands: Record<number, DisplayGameCard[]>;
-    currentPlayer: number;
+    currentPlayer: number | null;
     players: User[];
     topDiscardCard: DisplayGameCard[];
     activeColor?: string | null;
+    winnerId?: number | null;
   }) => {
     console.log({ gameState });
+
+    const isGameOver = (gameState.winnerId ?? null) !== null;
+
+    if (isGameOver) {
+      showGameOver(gameState);
+      return;
+    }
     
     // Update the discard pile with the top card
     updateDiscardPile(gameState.topDiscardCard, gameState.activeColor);
-    updateOpponentHands(gameState.playerHands, gameState.currentPlayer);
-    updateTurnIndicator(gameState.currentPlayer);
+    if (gameState.currentPlayer != null) {
+      updateOpponentHands(gameState.playerHands, gameState.currentPlayer);
+      updateTurnIndicator(gameState.currentPlayer);
+    }
   },
 );
 
@@ -423,5 +433,65 @@ function updateTurnIndicator(currentPlayerId: number) {
   } else {
     indicator.textContent = "Waiting...";
     indicator.style.background = "rgba(0, 0, 0, 0.8)";
+  }
+}
+
+function showGameOver(gameState: {
+  players: User[];
+  winnerId?: number | null;
+}) {
+  const myUserId = parseInt(document.body.dataset.userId || "0");
+  const winner =
+    gameState.winnerId != null
+      ? gameState.players.find((p) => p.id === gameState.winnerId)
+      : null;
+
+  const message = winner
+    ? winner.id === myUserId
+      ? "🎉 You win!"
+      : `🎉 ${winner.username} wins!`
+    : "Game over";
+
+  // Create or update a status banner
+  let statusEl = document.getElementById("game-status");
+  if (!statusEl) {
+    statusEl = document.createElement("div");
+    statusEl.id = "game-status";
+    statusEl.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      z-index: 2000;
+    `;
+    document.body.appendChild(statusEl);
+  }
+
+  statusEl.textContent = message;
+
+  // Disable input: drawing & playing
+  const drawPile = document.getElementById("draw-pile");
+  if (drawPile) {
+    drawPile.style.pointerEvents = "none";
+    drawPile.style.opacity = "0.5";
+  }
+
+  const playerHand = document.querySelector(".player-hand") as HTMLElement | null;
+  if (playerHand) {
+    playerHand.style.pointerEvents = "none";
+    playerHand.style.opacity = "0.7";
+  }
+
+  const indicator = document.getElementById("turn-indicator");
+  if (indicator) {
+    indicator.textContent = "Game Over";
+    indicator.style.background = "#c0392b";
   }
 }

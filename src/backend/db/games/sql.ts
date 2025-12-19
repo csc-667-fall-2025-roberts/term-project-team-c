@@ -56,14 +56,23 @@ export const SET_CURRENT_PLAYER = `
 `;
 
 export const GET_GAME_STATE = `
-  SELECT active_color, pending_draw_count, play_direction 
-  FROM games WHERE id=$1
+  SELECT active_color, pending_draw_count, play_direction, winner_id, state
+  FROM games
+  WHERE id=$1
 `;
 
 export const UPDATE_GAME_STATE = `
   UPDATE games 
   SET active_color=$1, pending_draw_count=$2, play_direction=$3
   WHERE id=$4
+`;
+
+export const SET_WINNER = `
+  UPDATE games
+  SET state='completed',
+      winner_id=$2,
+      current_turn_user_id=NULL
+  WHERE id=$1
 `;
 
 export const RESET_PENDING_DRAWS = `

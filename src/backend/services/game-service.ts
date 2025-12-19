@@ -146,6 +146,8 @@ export const get = async (gameId: number) => {
     activeColor: gameState.active_color, // Current active color for wild cards
     pendingDrawCount: gameState.pending_draw_count, // Cards to be drawn
     playDirection: gameState.play_direction, // 1 for clockwise, -1 for counter-clockwise
+    winnerId: gameState.winner_id,
+    state: gameState.state, 
   };
 };
 
@@ -155,6 +157,13 @@ export const playCard = async (
   cardId: number,
   chosenColor?: string
 ) => {
+  const gameStateBefore = await Games.getGameState(gameId);
+  if (gameStateBefore.winner_id !== null) {
+    logger.info(
+      `User ${userId} tried to play in finished game ${gameId} (winner=${gameStateBefore.winner_id})`,
+    );
+    throw new Error("Game is already over");
+  }
   // Validate it's the player's turn
   const currentPlayerId = await Games.getCurrentPlayer(gameId);
   if (currentPlayerId !== userId) {
@@ -165,7 +174,7 @@ export const playCard = async (
   const playerHands = await GameCards.playerHands(gameId);
   const cardToPlay = playerHands[userId]?.find(c => c.id === cardId);
   if (!cardToPlay) {
-    throw new Error("Card not in your hand");
+    throw new Error("Card not in your hand"); 
   }
 
   // Get the top discard card and game state
@@ -202,6 +211,23 @@ export const playCard = async (
     gameState.pending_draw_count,
   );
 
+  const updatedHands = await GameCards.playerHands(gameId);
+  const remainingCards = updatedHands[userId] || [];
+
+  if (remainingCards.length === 0) {
+    await Games.setWinner(gameId, userId);
+
+    logger.info(`Game ${gameId} has ended. Winner user_id=${userId}`);
+
+    return {
+      success: true,
+      gameOver: true,
+      winnerId: userId,
+      activeColor: effects.activeColor,
+      pendingDrawCount: effects.pendingDrawCount,
+    };
+  }
+
   // Update game state
   const newDirection = gameState.play_direction * effects.directionMultiplier;
   await Games.updateGameState(
@@ -214,18 +240,24 @@ export const playCard = async (
   // Calculate and set next player
   const playerIds = await GamePlayers.getGamePlayerIds(gameId);
   const currentIndex = playerIds.findIndex(p => p.user_id === userId);
+  const reverse = playerIds.length === 2 && cardToPlay.card_symbol === "swap";
+
+  const realSkipCount = reverse ? 1 : effects.skipCount;
+
   const nextIndex = calculateNextPlayer(
     currentIndex,
     playerIds.length,
     newDirection,
-    effects.skipCount,
+    realSkipCount,
   );
+
   const nextPlayerId = playerIds[nextIndex].user_id;
 
   await Games.setCurrentPlayer(gameId, nextPlayerId);
 
   return {
     success: true,
+    gameOver: false,
     nextPlayerId,
     activeColor: effects.activeColor,
     pendingDrawCount: effects.pendingDrawCount,
