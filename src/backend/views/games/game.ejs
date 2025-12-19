@@ -28,9 +28,11 @@
           <%= name || `Game ${id}` %>
           <span class="game-meta-info">• <%= state %> • <%= max_players %> players</span>
         </h1>
+        <% if (state !== 'active') { %>
         <form method="post" action="/games/<%= id %>/start">
           <button type="submit">Start Game (Placeholder)</button>
         </form>
+        <% } %>
         <a href="/lobby" style="color: white; text-decoration: none">Exit Game</a>
       </div>
 
