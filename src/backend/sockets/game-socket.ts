@@ -38,6 +38,9 @@ export const broadcastGameState = (
     currentPlayer: number;
     players: User[];
     topDiscardCard: DisplayGameCard[];
+    activeColor?: string | null;
+    pendingDrawCount?: number;
+    playDirection?: number;
   },
 ) => {
   Object.entries(state.playerHands).forEach((element) => {
@@ -72,18 +75,37 @@ export const registerGameHandlers = (io: Server, socket: Socket, gameId: number,
   socket.on(GAME_DRAW_CARD, async () => {
     try {
       logger.info(`User ${userId} drawing card in game ${gameId}`);
-      
+
       // Call the service to draw a card
       await GameService.drawCard(gameId, userId);
-      
+
       // Get updated game state
       const gameState = await GameService.get(gameId);
-      
+
       // Broadcast to all players
       broadcastGameState(io, gameId, gameState);
     } catch (error) {
       logger.error(`Error drawing card: ${error}`);
       socket.emit("game:error", { message: error instanceof Error ? error.message : "Failed to draw card" });
+    }
+  });
+
+  // Handle pass turn event
+  socket.on("game:pass-turn", async () => {
+    try {
+      logger.info(`User ${userId} passing turn in game ${gameId}`);
+
+      // Call the service to pass the turn
+      await GameService.passTurn(gameId, userId);
+
+      // Get updated game state
+      const gameState = await GameService.get(gameId);
+
+      // Broadcast to all players
+      broadcastGameState(io, gameId, gameState);
+    } catch (error) {
+      logger.error(`Error passing turn: ${error}`);
+      socket.emit("game:error", { message: error instanceof Error ? error.message : "Failed to pass turn" });
     }
   });
 };

@@ -279,3 +279,30 @@ export const drawCard = async (gameId: number, userId: number) => {
       nextPlayerId,
     };
 }
+
+export const passTurn = async (gameId: number, userId: number) => {
+  // Validate it's the player's turn
+  const currentPlayer = await Games.getCurrentPlayer(gameId);
+  if (currentPlayer !== userId) {
+    throw new Error("Not your turn");
+  }
+
+  const gameState = await Games.getGameState(gameId);
+
+  // Advance to next player
+  const playerIds = await GamePlayers.getGamePlayerIds(gameId);
+  const currentIndex = playerIds.findIndex(p => p.user_id === userId);
+  const nextIndex = calculateNextPlayer(
+    currentIndex,
+    playerIds.length,
+    gameState.play_direction,
+    0, // no skip
+  );
+  const nextPlayerId = playerIds[nextIndex].user_id;
+
+  await Games.setCurrentPlayer(gameId, nextPlayerId);
+  return {
+    success: true,
+    nextPlayerId,
+  };
+}
