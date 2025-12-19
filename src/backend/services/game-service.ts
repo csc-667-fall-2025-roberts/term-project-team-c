@@ -89,7 +89,7 @@ export const drawCard = async (gameId: number, userId: number) => {
   const drawnCard = cards[0];
 
   //Add the card to the player's hand
-  await GameCards.dealCards(gameId, userId, [drawnCard.id]);
+  await GameCards.dealCards(gameId, userId, [drawnCard.card_id]);
 
   return drawnCard;
 };
