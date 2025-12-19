@@ -26,13 +26,19 @@ socket.on(
   }) => {
     console.log({ gameState });
 
+    // Hide waiting overlay when game starts
+    const waitingOverlay = document.getElementById("waiting-overlay");
+    if (waitingOverlay && gameState.currentPlayer !== null) {
+      waitingOverlay.style.display = "none";
+    }
+
     const isGameOver = (gameState.winnerId ?? null) !== null;
 
     if (isGameOver) {
       showGameOver(gameState);
       return;
     }
-    
+
     // Update the discard pile with the top card
     updateDiscardPile(gameState.topDiscardCard, gameState.activeColor);
     if (gameState.currentPlayer != null) {

@@ -74,6 +74,7 @@ router.get("/:id", async (request, response) => {
     ...game,
     currentUserId,
     topCard,
+    isHost: game.created_by === currentUserId,
   });
 });
 
@@ -87,10 +88,18 @@ router.post("/:game_id/join", async (request, response) => {
 });
 
 router.post("/:game_id/start", async (request, response) => {
-	console.log("Starting the game");
   const { game_id } = request.params;
   const gameId = parseInt(game_id);
+  const userId = request.session.user!.id;
 
+  // Check if the user is the host (created_by)
+  const game = await Games.get(gameId);
+  if (game.created_by !== userId) {
+    logger.warn(`User ${userId} tried to start game ${gameId} but is not the host (host=${game.created_by})`);
+    return response.status(403).send("Only the host can start the game");
+  }
+
+  logger.info(`Host ${userId} starting game ${gameId}`);
   await GameService.start(gameId);
 
   const state = await GameService.get(gameId);

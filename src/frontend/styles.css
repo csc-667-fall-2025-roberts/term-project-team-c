@@ -3,7 +3,6 @@
 @import './styles/animations.css';
 @import './styles/cards.css';
 @import './styles/game.css'; /* Scoped internally to .game-page */
-@import './styles/dev-menu.css';
 
 /* ==================== GLOBAL DEFAULTS ==================== */
 * {

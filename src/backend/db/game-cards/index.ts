@@ -24,7 +24,13 @@ export const dealCards = async (gameId: number, userId: number, cardIds: number[
 };
 
 export const playerHands = async (gameId: number) => {
-  return (await db.many<DisplayGameCard>(PLAYER_HANDS, [gameId])).reduce(
+  const cards = await db.manyOrNone<DisplayGameCard>(PLAYER_HANDS, [gameId]);
+
+  if (!cards || cards.length === 0) {
+    return {} as Record<number, DisplayGameCard[]>;
+  }
+
+  return cards.reduce(
     (memo, card) => {
       if (card.user_id < 1) {
         return memo;

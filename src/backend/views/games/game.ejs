@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/css/bundle.css" />
     <script type="module" src="/js/game.js" defer></script>
     <script type="module" src="/js/chat.js" defer></script>
-    <script type="module" src="/js/dev-menu.js" defer></script>
   </head>
   <%
     function getCardDisplayValue(symbol) {
@@ -20,18 +19,92 @@
       return symbolMap[symbol] || symbol;
     }
   %>
-  <body class="game-page" data-game-id="<%= id %>" data-user-id="<%= currentUserId %>">
+  <body class="game-page" data-game-id="<%= id %>" data-user-id="<%= currentUserId %>" data-is-host="<%= isHost %>">
+    <!-- Waiting overlay for lobby state -->
+    <% if (state === 'lobby') { %>
+    <div id="waiting-overlay" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1500;
+      backdrop-filter: blur(3px);
+    ">
+      <div style="
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 60px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        max-width: 500px;
+      ">
+        <div style="font-size: 48px; margin-bottom: 20px;">⏳</div>
+        <div style="font-size: 28px; font-weight: bold; margin-bottom: 15px;">
+          Waiting for Game to Start
+        </div>
+        <div style="font-size: 16px; opacity: 0.9; margin-bottom: 20px;">
+          <% if (isHost) { %>
+            You are the host. Click "Start Game" when ready!
+          <% } else { %>
+            Waiting for the host to start the game...
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <% } %>
     <div class="game-container">
-      <div class="game-header">
+      <div class="game-header" style="position: relative; z-index: 2000;">
         <h1>
           <img src="/favicon.svg" class="site-logo" alt="Uno Logo" />
           <%= name || `Game ${id}` %>
+          <% if (isHost) { %>
+          <span style="
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+            color: #2c3e50;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 12px;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(243, 156, 18, 0.4);
+          ">👑 HOST</span>
+          <% } %>
           <span class="game-meta-info">• <%= state %> • <%= max_players %> players</span>
         </h1>
-        <% if (state !== 'active') { %>
+        <% if (state !== 'active' && isHost) { %>
         <form method="post" action="/games/<%= id %>/start">
-          <button type="submit">Start Game (Placeholder)</button>
+          <button type="submit" style="
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+          " onmouseover="this.style.background='#229954'; this.style.transform='scale(1.05)'"
+             onmouseout="this.style.background='#27ae60'; this.style.transform='scale(1)'">
+            🎮 Start Game
+          </button>
         </form>
+        <% } else if (state !== 'active') { %>
+        <div style="
+          background: rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.7);
+          padding: 8px 16px;
+          border-radius: 8px;
+          font-size: 14px;
+        ">
+          Waiting for host...
+        </div>
         <% } %>
         <a href="/lobby" style="color: white; text-decoration: none">Exit Game</a>
       </div>
