@@ -14,15 +14,21 @@ function validateCardPlay(
   const playedSymbol = cardToPlay.card_symbol;
   const playedColor = cardToPlay.card_color;
   const topSymbol = topCard.card_symbol;
-  const topColor = activeColor || topCard.card_color;
 
+  // Use activeColor if set (from wild cards), otherwise use top card's color
+  const effectiveColor = activeColor || topCard.card_color;
+
+  // Must counter draw cards with draw cards
   if (pendingDrawCount > 0) {
     return playedSymbol === "plus_two" || playedSymbol === "plus_four";
   }
+
+  // Wild cards can always be played
   if(playedSymbol === "wildcard" || playedSymbol === "plus_four") {
     return true;
   }
-  const effectiveColor = activeColor || topColor;
+
+  // Regular cards: match color OR symbol
   return playedColor === effectiveColor || playedSymbol === topSymbol;
 }
 
