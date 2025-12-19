@@ -41,11 +41,9 @@ socket.on(
 
     // Update the discard pile with the top card
     updateDiscardPile(gameState.topDiscardCard, gameState.activeColor);
-    if (gameState.currentPlayer != null) {
-      updateOpponentHands(gameState.playerHands, gameState.currentPlayer);
-      updateTurnIndicator(gameState.currentPlayer);
-      updatePassTurnButton(gameState.currentPlayer, gameState.pendingDrawCount || 0);
-    }
+    updateOpponentHands(gameState.playerHands, gameState.currentPlayer);
+    updateTurnIndicator(gameState.currentPlayer);
+    updatePassTurnButton(gameState.currentPlayer, gameState.pendingDrawCount || 0);
   },
 );
 

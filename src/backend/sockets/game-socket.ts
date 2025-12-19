@@ -24,6 +24,7 @@ export const initGameSocket = async (socket: Socket, gameId: number, userId: num
   try {
     const gameState = await GameService.get(gameId);
     socket.emit("game:player-hand", gameState.playerHands[userId] || []);
+    socket.emit(GAME_UPDATED, gameState);
   } catch (error) {
     logger.error(`Error sending initial game state: ${error}`);
   }
