@@ -22,6 +22,7 @@ socket.on(
     topDiscardCard: DisplayGameCard[];
     activeColor?: string | null;
     winnerId?: number | null;
+    pendingDrawCount?: number;
   }) => {
     console.log({ gameState });
 
@@ -37,6 +38,7 @@ socket.on(
     if (gameState.currentPlayer != null) {
       updateOpponentHands(gameState.playerHands, gameState.currentPlayer);
       updateTurnIndicator(gameState.currentPlayer);
+      updatePassTurnButton(gameState.currentPlayer, gameState.pendingDrawCount || 0);
     }
   },
 );
@@ -403,7 +405,7 @@ function getCardDisplayValue(symbol: string): string {
  */
 function updateTurnIndicator(currentPlayerId: number) {
   const turnIndicator = document.getElementById("turn-indicator");
-  
+
   if (!turnIndicator) {
     // Create turn indicator if it doesn't exist
     const indicator = document.createElement("div");
@@ -411,7 +413,7 @@ function updateTurnIndicator(currentPlayerId: number) {
     indicator.style.cssText = `
       position: fixed;
       top: 20px;
-      right: 20px;
+      right: 150px;
       background: rgba(0, 0, 0, 0.8);
       color: white;
       padding: 15px 25px;
@@ -421,12 +423,12 @@ function updateTurnIndicator(currentPlayerId: number) {
     `;
     document.body.appendChild(indicator);
   }
-  
+
   const indicator = document.getElementById("turn-indicator")!;
-  
+
   // Check if it's the current user's turn (you'll need userId from somewhere)
   const myUserId = parseInt(document.body.dataset.userId || "0");
-  
+
   if (currentPlayerId === myUserId) {
     indicator.textContent = "YOUR TURN";
     indicator.style.background = "#27ae60";
@@ -493,5 +495,81 @@ function showGameOver(gameState: {
   if (indicator) {
     indicator.textContent = "Game Over";
     indicator.style.background = "#c0392b";
+  }
+}
+
+/**
+ * 8. UPDATE PASS TURN BUTTON
+ * Shows/hides pass turn button based on game state
+ */
+function updatePassTurnButton(currentPlayerId: number, pendingDrawCount: number) {
+  const myUserId = parseInt(document.body.dataset.userId || "0");
+  const isMyTurn = currentPlayerId === myUserId;
+
+  let passTurnButton = document.getElementById("pass-turn-button");
+
+  if (!passTurnButton) {
+    // Create pass turn button if it doesn't exist
+    passTurnButton = document.createElement("button");
+    passTurnButton.id = "pass-turn-button";
+    passTurnButton.textContent = "Pass Turn";
+    passTurnButton.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 100;
+      display: none;
+      transition: background 0.2s;
+    `;
+
+    passTurnButton.addEventListener("mouseover", () => {
+      passTurnButton!.style.background = "#2980b9";
+    });
+
+    passTurnButton.addEventListener("mouseout", () => {
+      const hasPendingDraws = passTurnButton!.dataset.hasPendingDraws === "true";
+      passTurnButton!.style.background = hasPendingDraws ? "#e74c3c" : "#3498db";
+    });
+
+    passTurnButton.addEventListener("click", () => {
+      const hasPendingDraws = passTurnButton!.dataset.hasPendingDraws === "true";
+      if (hasPendingDraws) {
+        // Draw cards and pass turn
+        socket.emit(GAME_DRAW_CARD);
+      } else {
+        // Just pass the turn
+        socket.emit("game:pass-turn");
+      }
+    });
+
+    document.body.appendChild(passTurnButton);
+  }
+
+  // Show button when it's your turn
+  if (isMyTurn) {
+    passTurnButton.style.display = "block";
+
+    if (pendingDrawCount > 0) {
+      // Must draw cards before passing
+      passTurnButton.textContent = `Draw ${pendingDrawCount} & Pass`;
+      passTurnButton.style.background = "#e74c3c";
+      passTurnButton.dataset.hasPendingDraws = "true";
+    } else {
+      // Normal pass turn
+      passTurnButton.textContent = "Pass Turn";
+      passTurnButton.style.background = "#3498db";
+      passTurnButton.dataset.hasPendingDraws = "false";
+    }
+  } else {
+    passTurnButton.style.display = "none";
   }
 }
