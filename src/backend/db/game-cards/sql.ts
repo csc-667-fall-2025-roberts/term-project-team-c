@@ -40,3 +40,10 @@ export const TOP_DISCARD = `
   FROM game_cards, cards
   WHERE game_cards.game_id=$1 AND game_cards.user_id=-1 AND cards.id=game_cards.card_id
 `;
+
+export const MOVE_CARD_TO_DISCARD = `
+  UPDATE game_cards
+  SET user_id = -1
+  WHERE id = $1 AND game_id = $2 AND user_id = $3
+  RETURNING *
+`;

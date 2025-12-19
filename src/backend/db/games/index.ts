@@ -8,6 +8,7 @@ import {
   GET_CURRENT_PLAYER,
   JOIN_GAME,
   LIST_GAMES,
+  SET_CURRENT_PLAYER,
   SET_GAME_STATE,
 } from "./sql";
 
@@ -27,5 +28,11 @@ export const get = async (game_id: number) => await db.one<Game>(GAME_BY_ID, [ga
 
 export const start = async (game_id: number) => await db.none(SET_GAME_STATE, ["active", game_id]);
 
-export const getCurrentPlayer = async (game_id: number) =>
-  await db.one<number>(GET_CURRENT_PLAYER, [game_id]);
+export const getCurrentPlayer = async (game_id: number) => {
+  const result = await db.one<{ current_turn_user_id: number }>(GET_CURRENT_PLAYER, [game_id]);
+  return result.current_turn_user_id;
+};
+
+
+export const setCurrentPlayer = async (game_id: number, user_id: number) =>
+  await db.none(SET_CURRENT_PLAYER, [user_id, game_id]);

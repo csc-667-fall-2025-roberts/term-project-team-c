@@ -6,6 +6,7 @@ import {
   DEAL_CARDS,
   DRAW_CARDS,
   INITIAL_DISCARD,
+  MOVE_CARD_TO_DISCARD,
   PLAYER_HANDS,
   TOP_DISCARD,
 } from "./sql";
@@ -41,3 +42,8 @@ export const setInitialDiscard = async (gameId: number) => await db.none(INITIAL
 
 export const getTopDiscard = async (gameId: number) =>
   await db.any<DisplayGameCard>(TOP_DISCARD, [gameId]);
+
+export const moveCardToDiscard = async (cardId: number, gameId: number, userId: number) => {
+  const result = await db.oneOrNone<GameCard>(MOVE_CARD_TO_DISCARD, [cardId, gameId, userId]);
+  return result;
+};

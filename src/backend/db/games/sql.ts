@@ -49,3 +49,8 @@ export const SET_GAME_STATE = `
 export const GET_CURRENT_PLAYER = `
   SELECT current_turn_user_id FROM games WHERE id=$1
 `;
+
+export const SET_CURRENT_PLAYER = `
+  UPDATE games SET current_turn_user_id=$1
+  WHERE id=$2
+`;

@@ -6,7 +6,7 @@ import logger from "@backend/lib/logger";
 import { GLOBAL_ROOM } from "@shared/keys";
 import { User } from "@shared/types";
 
-import { initGameSocket } from "./game-socket";
+import { initGameSocket, registerGameHandlers } from "./game-socket";
 
 export const initSockets = (httpServer: HTTPServer) => {
   const io = new Server(httpServer);
@@ -35,8 +35,10 @@ export const initSockets = (httpServer: HTTPServer) => {
     const id = parseInt(gameId, 10);
     if (!Number.isNaN(id)) {
       initGameSocket(socket, id, session.user.id);
+      registerGameHandlers(io, socket, id, session.user.id);  // Add this line
     }
   }
+
 
   socket.on("close", () => {
     logger.info(`socket for user ${session.user.username} closed`);

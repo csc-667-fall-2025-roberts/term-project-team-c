@@ -24,9 +24,13 @@ export const start = async (gameId: number) => {
   // Update game state to active
   await Games.start(gameId);
 
-  // Do we return here or write another function to get game states
-  return { nextPlayer: playerIds[0] };
+  // Set the first player's turn
+  const firstPlayerId = playerIds[0].user_id;
+  await Games.setCurrentPlayer(gameId, firstPlayerId);
+
+  return { nextPlayer: firstPlayerId };
 };
+
 
 export const get = async (gameId: number) => {
   // player hands
@@ -48,8 +52,31 @@ export const get = async (gameId: number) => {
 };
 
 export const playCard = async (gameId: number, userId: number, cardId: number) => {
+  // 1. Verify it's the player's turn
+  const currentPlayer = await Games.getCurrentPlayer(gameId);
+  if (currentPlayer !== userId) {
+    throw new Error("Not your turn");
+  }
 
+  // 2. Move the card from player's hand to discard pile
+  const movedCard = await GameCards.moveCardToDiscard(cardId, gameId, userId);
+  
+  if (!movedCard) {
+    throw new Error("Card not found or doesn't belong to player");
+  }
+
+  // 3. Get all players to determine next turn
+  const playerIds = await GamePlayers.getGamePlayerIds(gameId);
+  const currentPlayerIndex = playerIds.findIndex(p => p.user_id === userId);
+  const nextPlayerIndex = (currentPlayerIndex + 1) % playerIds.length;
+  const nextPlayerId = playerIds[nextPlayerIndex].user_id;
+
+  // 4. Update the current turn to next player
+  await Games.setCurrentPlayer(gameId, nextPlayerId);
+
+  return { movedCard, nextPlayerId };
 };
+
 
 export const drawCard = async (gameId: number, userId: number) => {
   //Draw one card from the deck
