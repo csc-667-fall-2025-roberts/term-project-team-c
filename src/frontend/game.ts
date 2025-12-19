@@ -283,9 +283,8 @@ function updateOpponentHands(
       for (let i = 0; i < cards.length; i++) {
         const cardBack = document.createElement("div");
         cardBack.className = "playing-card back";
-        if (i > 0) {
-          cardBack.style.marginTop = "-80px";
-        }
+        cardBack.style.marginTop = "-80px";
+
         opponentHand.appendChild(cardBack);
       }
 
