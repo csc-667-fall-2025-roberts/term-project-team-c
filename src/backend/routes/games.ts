@@ -92,6 +92,33 @@ router.post("/:game_id/join", async (request, response) => {
   response.redirect(`/games/${game_id}`);
 });
 
+router.post("/:game_id/leave", async (request, response) => {
+  const { id } = request.session.user!;
+  const { game_id } = request.params;
+  const gameId = parseInt(game_id);
+
+  try {
+    // Remove player from the game
+    await GamePlayers.removePlayerFromGame(gameId, id);
+
+    logger.info(`User ${id} left game ${gameId}`);
+
+    // Check if there are any players left
+    const remainingPlayers = await GamePlayers.getGamePlayers(gameId);
+
+    if (!remainingPlayers || remainingPlayers.length === 0) {
+      logger.info(`Game ${gameId} now has no players remaining`);
+      // Optionally: Delete the game or mark it as abandoned
+      // await Games.delete(gameId);
+    }
+
+    response.redirect("/lobby");
+  } catch (error: any) {
+    logger.error(`Error leaving game: ${error}`);
+    response.redirect("/lobby");
+  }
+});
+
 router.post("/:game_id/start", async (request, response) => {
   const { game_id } = request.params;
   const gameId = parseInt(game_id);

@@ -41,9 +41,13 @@ socket.on(
 
     // Update the discard pile with the top card
     updateDiscardPile(gameState.topDiscardCard, gameState.activeColor);
-    updateOpponentHands(gameState.playerHands, gameState.currentPlayer);
-    updateTurnIndicator(gameState.currentPlayer);
-    updatePassTurnButton(gameState.currentPlayer, gameState.pendingDrawCount || 0);
+
+    // Only update game state if the game has started (currentPlayer is set)
+    if (gameState.currentPlayer !== null) {
+      updateOpponentHands(gameState.playerHands, gameState.currentPlayer);
+      updateTurnIndicator(gameState.currentPlayer);
+      updatePassTurnButton(gameState.currentPlayer, gameState.pendingDrawCount || 0);
+    }
   },
 );
 
@@ -438,7 +442,7 @@ function updateTurnIndicator(currentPlayerId: number) {
     indicator.id = "turn-indicator";
     indicator.style.cssText = `
       position: fixed;
-      top: 20px;
+      top: 60px;
       right: 150px;
       background: rgba(0, 0, 0, 0.8);
       color: white;
