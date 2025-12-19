@@ -7,6 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="stylesheet" href="/css/bundle.css" />
     <script type="module" src="/js/game.js" defer></script>
+    <script type="module" src="/js/chat.js" defer></script>
     <script type="module" src="/js/dev-menu.js" defer></script>
   </head>
   <body class="game-page" data-game-id="<%= id %>">
@@ -117,6 +118,16 @@
           <h3 style="color: white; margin-top: 10px">Your Hand</h3>
         </div>
       </div>
+			    <template id="template-chat-message">
+      <div class="chat-message">
+        <div class="message-header">
+          <span class="message-username"></span>
+          <span class="message-time"></span>
+        </div>
+        <span class="message-text"></span>
+      </div>
+    </template>
+
     </div>
 
     <template id="card-template">
