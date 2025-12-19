@@ -44,7 +44,6 @@ socket.on(chatKeys.CHAT_MESSAGE, (message: ChatMessage) => {
   appendMessage(message);
 });
 
-console.log("NEHEHEHEHEHE");
 const sendMessage = () => {
   const message = input.value.trim();
 
