@@ -48,13 +48,13 @@ export const broadcastGameState = (
 };
 
 export const registerGameHandlers = (io: Server, socket: Socket, gameId: number, userId: number) => {
-  // Handle play card event
-  socket.on(GAME_PLAY_CARD, async ({ cardId }: { cardId: number }) => {
+    // Handle play card event
+  socket.on(GAME_PLAY_CARD, async ({ cardId, chosenColor }: { cardId: number; chosenColor?: string }) => {
     try {
-      logger.info(`User ${userId} playing card ${cardId} in game ${gameId}`);
+      logger.info(`User ${userId} playing card ${cardId} in game ${gameId}${chosenColor ? ` with color ${chosenColor}` : ''}`);
       
-      // Call the service to play the card
-      await GameService.playCard(gameId, userId, cardId);
+      // Call the service to play the card with optional color
+      await GameService.playCard(gameId, userId, cardId, chosenColor);
       
       // Get updated game state
       const gameState = await GameService.get(gameId);
@@ -66,6 +66,7 @@ export const registerGameHandlers = (io: Server, socket: Socket, gameId: number,
       socket.emit("game:error", { message: error instanceof Error ? error.message : "Failed to play card" });
     }
   });
+
 
   // Handle draw card event
   socket.on(GAME_DRAW_CARD, async () => {

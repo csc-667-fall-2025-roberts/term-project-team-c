@@ -90,11 +90,14 @@ export type Game = {
   name?: string;
   created_by: number;
   max_players: number;
-	//player_count: number;
+  player_count: number;
 
   current_turn_user_id?: number;
-  is_clockwise?: boolean;
-  last_card_played?: number;
+  
+  // UNO-specific game state
+  active_color?: CardColor | string; // Current active color (for wild cards)
+  pending_draw_count: number;         // Cards to be drawn (for +2/+4 stacking)
+  play_direction: number;             // 1 for clockwise, -1 for counter-clockwise
 
   created_at: Date;
   players?: GameUser[];
@@ -110,3 +113,5 @@ export interface UnoGameAction {
   cards_drawn?: number;
   created_at: Date;
 }
+
+export type CardColorChoice = 'red' | 'blue' | 'green' | 'yellow';

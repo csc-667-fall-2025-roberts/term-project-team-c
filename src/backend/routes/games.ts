@@ -59,9 +59,21 @@ router.get("/:id", async (request, response) => {
 
   const game = await Games.get(gameId);
 
+  // Get the top discard card if the game has started
+  let topCard = null;
+  if (game.state === 'active') {
+    const gameState = await GameService.get(gameId);
+    const topDiscardCards = gameState.topDiscardCard;
+    if (topDiscardCards && topDiscardCards.length > 0) {
+      // Cards are ordered DESC, so first element is the top card
+      topCard = topDiscardCards[0];
+    }
+  }
+
   response.render("games/game", {
     ...game,
     currentUserId,
+    topCard,
   });
 });
 

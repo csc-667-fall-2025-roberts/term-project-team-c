@@ -31,19 +31,24 @@ export const INITIAL_DISCARD = `
     LIMIT 1
   )
   UPDATE game_cards
-  SET user_id = -1
+  SET user_id = -1, card_order = 0
   WHERE id IN (SELECT id FROM picked)
 `;
 
 export const TOP_DISCARD = `
-  SELECT game_cards.*, cards.card_symbol, cards.card_color 
+  SELECT game_cards.*, cards.card_symbol, cards.card_color
   FROM game_cards, cards
   WHERE game_cards.game_id=$1 AND game_cards.user_id=-1 AND cards.id=game_cards.card_id
+  ORDER BY game_cards.card_order DESC, game_cards.id DESC
 `;
 
 export const MOVE_CARD_TO_DISCARD = `
   UPDATE game_cards
-  SET user_id = -1
+  SET user_id = -1, card_order = (
+    SELECT COALESCE(MAX(card_order), 0) + 1
+    FROM game_cards
+    WHERE game_id = $2 AND user_id = -1
+  )
   WHERE id = $1 AND game_id = $2 AND user_id = $3
   RETURNING *
 `;

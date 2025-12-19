@@ -10,7 +10,17 @@
     <script type="module" src="/js/chat.js" defer></script>
     <script type="module" src="/js/dev-menu.js" defer></script>
   </head>
-  <body class="game-page" data-game-id="<%= id %>">
+  <%
+    function getCardDisplayValue(symbol) {
+      const symbolMap = {
+        'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4',
+        'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9',
+        'skip': '⊘', 'swap': '⇄', 'plus_two': '+2', 'plus_four': '+4', 'wildcard': '🌈'
+      };
+      return symbolMap[symbol] || symbol;
+    }
+  %>
+  <body class="game-page" data-game-id="<%= id %>" data-user-id="<%= currentUserId %>">
     <div class="game-container">
       <div class="game-header">
         <h1>
@@ -74,10 +84,11 @@
               <% if (typeof topCard !== 'undefined' && topCard) { %>
               <div
                 class="playing-card <%= topCard.card_color %>"
-                data-value="<%= topCard.card_symbol %>"
+                data-value="<%= getCardDisplayValue(topCard.card_symbol) %>"
+                data-symbol="<%= topCard.card_symbol %>"
               ></div>
               <% } else { %>
-              <div class="playing-card red" data-value="7"></div>
+              <div class="playing-card red" data-value="7" data-symbol="seven"></div>
               <% } %>
             </div>
           </div>
@@ -109,7 +120,8 @@
             <% myCards.forEach(card => { %>
             <div
               class="playing-card <%= card.card_color %>"
-              data-value="<%= card.card_symbol %>"
+              data-value="<%= getCardDisplayValue(card.card_symbol) %>"
+              data-symbol="<%= card.card_symbol %>"
               data-id="<%= card.id %>"
             ></div>
             <% }) %>

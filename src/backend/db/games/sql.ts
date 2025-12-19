@@ -54,3 +54,26 @@ export const SET_CURRENT_PLAYER = `
   UPDATE games SET current_turn_user_id=$1
   WHERE id=$2
 `;
+
+export const GET_GAME_STATE = `
+  SELECT active_color, pending_draw_count, play_direction 
+  FROM games WHERE id=$1
+`;
+
+export const UPDATE_GAME_STATE = `
+  UPDATE games 
+  SET active_color=$1, pending_draw_count=$2, play_direction=$3
+  WHERE id=$4
+`;
+
+export const RESET_PENDING_DRAWS = `
+  UPDATE games 
+  SET pending_draw_count=0
+  WHERE id=$1
+`;
+
+export const ADD_PENDING_DRAWS = `
+  UPDATE games 
+  SET pending_draw_count = pending_draw_count + $1
+  WHERE id=$2
+`;
