@@ -265,19 +265,20 @@ function updateOpponentHands(
   currentPlayerId: number
 ) {
   const myUserId = parseInt(document.body.dataset.userId || "0");
-  
+
   Object.entries(playerHands).forEach(([userId, cards]) => {
     const playerIdNum = parseInt(userId);
-    
+
     // Skip the current user's hand
     if (playerIdNum === myUserId) return;
-    
-    // Find opponent card container (you'll need to add data-user-id to opponent divs)
-    const opponentHand = document.querySelector(`[data-user-id="${userId}"] .opponent-hand`);
-    
+
+    // Find opponent card container
+    const opponentCard = document.querySelector(`[data-user-id="${userId}"]`);
+    const opponentHand = opponentCard?.querySelector('.opponent-hand');
+
     if (opponentHand) {
       opponentHand.innerHTML = "";
-      
+
       // Add back-facing cards for each card in opponent's hand
       for (let i = 0; i < cards.length; i++) {
         const cardBack = document.createElement("div");
@@ -286,6 +287,28 @@ function updateOpponentHands(
           cardBack.style.marginTop = "-80px";
         }
         opponentHand.appendChild(cardBack);
+      }
+
+      // Add card count badge
+      const existingBadge = opponentCard?.querySelector('.card-count-badge');
+      if (existingBadge) {
+        existingBadge.textContent = `${cards.length} cards`;
+      } else {
+        const badge = document.createElement('div');
+        badge.className = 'card-count-badge';
+        badge.textContent = `${cards.length} ${cards.length === 1 ? 'card' : 'cards'}`;
+        badge.style.cssText = `
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: bold;
+        `;
+        opponentCard?.appendChild(badge);
       }
     }
   });

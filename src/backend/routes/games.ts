@@ -2,6 +2,7 @@ import express from "express";
 import { Server } from "socket.io";
 
 import * as Games from "@backend/db/games";
+import * as GamePlayers from "@backend/db/game-players";
 import { generateGameName } from "@backend/lib/game-names";
 import logger from "@backend/lib/logger";
 import * as GameService from "@backend/services/game-service";
@@ -59,6 +60,9 @@ router.get("/:id", async (request, response) => {
 
   const game = await Games.get(gameId);
 
+  // Get all players in the game
+  const players = await GamePlayers.getGamePlayers(gameId);
+
   // Get the top discard card if the game has started
   let topCard = null;
   if (game.state === 'active') {
@@ -75,6 +79,7 @@ router.get("/:id", async (request, response) => {
     currentUserId,
     topCard,
     isHost: game.created_by === currentUserId,
+    players,
   });
 });
 

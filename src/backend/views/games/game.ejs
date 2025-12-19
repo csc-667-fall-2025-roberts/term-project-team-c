@@ -110,40 +110,43 @@
       </div>
 
       <div class="game-layout">
-        <div class="opponent-card opponent-top">
-          <div class="player-info">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Cpu" class="player-avatar" />
-            <div style="text-align: center">CPU (Top)</div>
-          </div>
-          <div class="opponent-hand">
-            <div class="playing-card back"></div>
-            <div class="playing-card back"></div>
-            <div class="playing-card back"></div>
-          </div>
-        </div>
+        <%
+          // Get opponents (all players except current user)
+          const opponents = players.filter(p => p.id !== currentUserId);
+          const positions = ['opponent-top', 'opponent-left', 'opponent-right'];
+        %>
 
-        <div class="opponent-card opponent-left">
+        <% opponents.forEach((opponent, index) => {
+          if (index < 3) { // Max 3 opponents shown
+            const position = positions[index];
+        %>
+        <div class="opponent-card <%= position %>" data-user-id="<%= opponent.id %>" style="position: relative;">
           <div class="player-info">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=P2" class="player-avatar" />
-            <div>Player 2</div>
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=<%= opponent.username %>" class="player-avatar" style="border: 3px solid #3498db; box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);" />
+            <div style="text-align: <%= position === 'opponent-top' ? 'center' : 'left' %>; font-weight: 600; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+              <%= opponent.username %>
+            </div>
           </div>
           <div class="opponent-hand">
-            <div class="playing-card back"></div>
-            <div class="playing-card back" style="margin-top: -80px"></div>
-            <div class="playing-card back" style="margin-top: -80px"></div>
+            <!-- Cards will be dynamically updated via socket -->
           </div>
         </div>
+        <% }
+        }); %>
 
-        <div class="opponent-card opponent-right">
+        <% // Fill empty slots with placeholders if less than 3 opponents
+        for (let i = opponents.length; i < 3; i++) {
+          const position = positions[i];
+        %>
+        <div class="opponent-card <%= position %> empty-slot" style="opacity: 0.3;">
           <div class="player-info">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=P3" class="player-avatar" />
-            <div>Player 3</div>
-          </div>
-          <div class="opponent-hand">
-            <div class="playing-card back"></div>
-            <div class="playing-card back" style="margin-top: -80px"></div>
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Empty<%= i %>" class="player-avatar" />
+            <div style="text-align: <%= position === 'opponent-top' ? 'center' : 'left' %>; color: #888;">
+              Waiting...
+            </div>
           </div>
         </div>
+        <% } %>
 
         <div class="center-game-area">
           <div class="deck-section">
@@ -202,7 +205,13 @@
             <% }) %>
             <% } %>
           </div>
-          <h3 style="color: white; margin-top: 10px">Your Hand</h3>
+          <%
+            const currentPlayerInfo = players.find(p => p.id === currentUserId);
+            const currentUsername = currentPlayerInfo ? currentPlayerInfo.username : 'You';
+          %>
+          <h3 style="color: white; margin-top: 10px">
+            <%= currentUsername %>'s Hand
+          </h3>
         </div>
       </div>
 			    <template id="template-chat-message">
