@@ -52,7 +52,7 @@ export const updateGameState = async (
   game_id: number,
   active_color: string | null,
   pending_draw_count: number,
-  play_direction: number;
+  play_direction: number,
 ) => await db.none(UPDATE_GAME_STATE, [active_color, pending_draw_count, play_direction, game_id]);
 
 export const resetPendingDraws = async (game_id: number) =>

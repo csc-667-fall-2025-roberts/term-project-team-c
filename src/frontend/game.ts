@@ -448,35 +448,120 @@ function showGameOver(gameState: {
       ? gameState.players.find((p) => p.id === gameState.winnerId)
       : null;
 
+  const isWinner = winner && winner.id === myUserId;
   const message = winner
     ? winner.id === myUserId
-      ? "🎉 You win!"
-      : `🎉 ${winner.username} wins!`
-    : "Game over";
+      ? "🎉 YOU WIN! 🎉"
+      : `${winner.username} Wins!`
+    : "Game Over";
 
-  // Create or update a status banner
+  // Create overlay
+  let overlay = document.getElementById("game-over-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "game-over-overlay";
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.5s ease-in;
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  // Create or update game over modal
   let statusEl = document.getElementById("game-status");
   if (!statusEl) {
     statusEl = document.createElement("div");
     statusEl.id = "game-status";
     statusEl.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.9);
+      background: ${isWinner ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'linear-gradient(135deg, #434343 0%, #000000 100%)'};
       color: white;
-      padding: 30px 40px;
-      border-radius: 12px;
-      font-size: 24px;
-      font-weight: bold;
+      padding: 40px 60px;
+      border-radius: 20px;
       text-align: center;
-      z-index: 2000;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: slideIn 0.6s ease-out;
+      max-width: 500px;
     `;
-    document.body.appendChild(statusEl);
+    overlay.appendChild(statusEl);
   }
 
-  statusEl.textContent = message;
+  statusEl.innerHTML = `
+    <div style="font-size: 48px; margin-bottom: 20px; animation: bounce 1s ease-in-out;">
+      ${isWinner ? '🏆' : '🎮'}
+    </div>
+    <div style="font-size: 32px; font-weight: bold; margin-bottom: 15px;">
+      ${message}
+    </div>
+    ${winner ? `<div style="font-size: 18px; opacity: 0.9; margin-bottom: 30px;">
+      Congratulations ${winner.username}!
+    </div>` : ''}
+    <button id="return-to-lobby-btn" style="
+      background: white;
+      color: #333;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 10px;
+    ">
+      Return to Lobby
+    </button>
+  `;
+
+  // Add event listener to the return to lobby button
+  const returnButton = document.getElementById("return-to-lobby-btn");
+  if (returnButton) {
+    returnButton.addEventListener("mouseover", () => {
+      returnButton.style.transform = "scale(1.05)";
+      returnButton.style.boxShadow = "0 4px 12px rgba(255, 255, 255, 0.3)";
+    });
+    returnButton.addEventListener("mouseout", () => {
+      returnButton.style.transform = "scale(1)";
+      returnButton.style.boxShadow = "none";
+    });
+    returnButton.addEventListener("click", () => {
+      window.location.href = "/lobby";
+    });
+  }
+
+  // Add CSS animations if not already added
+  if (!document.getElementById('game-over-animations')) {
+    const style = document.createElement('style');
+    style.id = 'game-over-animations';
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateY(-50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   // Disable input: drawing & playing
   const drawPile = document.getElementById("draw-pile");
@@ -489,6 +574,12 @@ function showGameOver(gameState: {
   if (playerHand) {
     playerHand.style.pointerEvents = "none";
     playerHand.style.opacity = "0.7";
+  }
+
+  // Hide pass turn button
+  const passTurnButton = document.getElementById("pass-turn-button");
+  if (passTurnButton) {
+    passTurnButton.style.display = "none";
   }
 
   const indicator = document.getElementById("turn-indicator");

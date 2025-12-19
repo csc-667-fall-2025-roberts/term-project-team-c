@@ -1,6 +1,7 @@
 import * as GameCards from "../db/game-cards";
 import * as GamePlayers from "../db/game-players";
 import * as Games from "../db/games";
+import logger from "../lib/logger";
 
 /**
  * Validate if a card can be played with UNO rules
@@ -266,6 +267,15 @@ export const playCard = async (
 
 
 export const drawCard = async (gameId: number, userId: number) => {
+  // Check if game is already over
+  const gameStateBefore = await Games.getGameState(gameId);
+  if (gameStateBefore.winner_id !== null) {
+    logger.info(
+      `User ${userId} tried to draw in finished game ${gameId} (winner=${gameStateBefore.winner_id})`,
+    );
+    throw new Error("Game is already over");
+  }
+
   // Validate it's the player's turn
   const currentPlayer = await Games.getCurrentPlayer(gameId);
   if (currentPlayer !== userId) {
@@ -313,6 +323,15 @@ export const drawCard = async (gameId: number, userId: number) => {
 }
 
 export const passTurn = async (gameId: number, userId: number) => {
+  // Check if game is already over
+  const gameStateBefore = await Games.getGameState(gameId);
+  if (gameStateBefore.winner_id !== null) {
+    logger.info(
+      `User ${userId} tried to pass turn in finished game ${gameId} (winner=${gameStateBefore.winner_id})`,
+    );
+    throw new Error("Game is already over");
+  }
+
   // Validate it's the player's turn
   const currentPlayer = await Games.getCurrentPlayer(gameId);
   if (currentPlayer !== userId) {
