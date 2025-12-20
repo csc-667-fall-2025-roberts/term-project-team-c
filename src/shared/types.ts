@@ -15,6 +15,7 @@ export interface DbChatMessage {
   id: number;
   user_id: number;
   message: string;
+  game_id?: number;
   created_at: Date;
 }
 
