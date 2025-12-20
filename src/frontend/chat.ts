@@ -2,7 +2,11 @@ import socketIo from "socket.io-client";
 import * as chatKeys from "../shared/keys";
 import type { ChatMessage } from "@shared/types";
 
-const socket = socketIo();
+// Check if we're on a game page and include gameId in socket connection
+const gamePageElement = document.querySelector<HTMLElement>("[data-game-id]");
+const gameId = gamePageElement?.dataset.gameId;
+
+const socket = gameId ? socketIo({ query: { gameId } }) : socketIo();
 
 const listing = document.querySelector<HTMLDivElement>("#message-listing")!;
 const input = document.querySelector<HTMLInputElement>("#message-submit input")!;
@@ -48,7 +52,10 @@ const sendMessage = () => {
   const message = input.value.trim();
 
   if (message.length > 0) {
-    const body = JSON.stringify({ message });
+    const body = JSON.stringify({
+      message,
+      game_id: gameId ? parseInt(gameId) : undefined
+    });
 
     fetch("/chat/", {
       method: "post",
@@ -77,10 +84,16 @@ input.addEventListener("keydown", (event) => {
 });
 
 // Load message history when page loads
-fetch("/chat/", {
-  method: "get",
-  credentials: "include",
-});
+const loadMessages = () => {
+  const url = gameId ? `/chat/${gameId}` : "/chat/";
+
+  fetch(url, {
+    method: "get",
+    credentials: "include",
+  });
+};
+
+loadMessages();
 
 const formatTimeAgo = (date: Date): string => {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
