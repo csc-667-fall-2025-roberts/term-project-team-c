@@ -37,6 +37,7 @@ const appendMessage = ({ username, created_at, message }: ChatMessage) => {
 socket.on(chatKeys.CHAT_LISTING, ({ messages }: { messages: ChatMessage[] }) => {
   console.log(chatKeys.CHAT_LISTING, { messages });
 
+  listing.innerHTML = "";
   messages.forEach((message) => {
     appendMessage(message);
   });
@@ -72,7 +73,6 @@ const sendMessage = () => {
 
 button.addEventListener("click", (event) => {
   event.preventDefault();
-	console.log("IAJSDOAJD");
 
   sendMessage();
 });

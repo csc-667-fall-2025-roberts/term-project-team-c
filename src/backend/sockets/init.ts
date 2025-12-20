@@ -28,15 +28,16 @@ export const initSockets = (httpServer: HTTPServer) => {
   if (session.id) {
     socket.join(session.id);
   }
-  socket.join(GLOBAL_ROOM);
 
   const gameId = socket.handshake.query.gameId as string | undefined;
   if (gameId) {
     const id = parseInt(gameId, 10);
     if (!Number.isNaN(id)) {
       initGameSocket(socket, id, session.user.id);
-      registerGameHandlers(io, socket, id, session.user.id);  // Add this line
+      registerGameHandlers(io, socket, id, session.user.id);
     }
+  } else {
+    socket.join(GLOBAL_ROOM);
   }
 
 
