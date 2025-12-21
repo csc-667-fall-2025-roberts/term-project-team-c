@@ -211,11 +211,14 @@ body.game-page {
   transform: scale(0.7);
   transform-origin: center;
   margin-top: 50px;
+  max-height: 400px;
+  overflow: hidden;
+  position: relative;
 }
 
-.game-page .opponent-left .playing-card, 
-.game-page .opponent-right .playing-card { 
-  margin-top: -80px; 
+.game-page .opponent-left .playing-card,
+.game-page .opponent-right .playing-card {
+  margin-top: -80px;
 }
 
 /* 7. Chat (Bottom Left) */
