@@ -23,7 +23,9 @@ export const initSockets = (httpServer: HTTPServer) => {
     return;
   }
 
-  logger.info(`socket for user ${session.user.username} established`);
+  const user = session.user; // Store user reference for use in callbacks
+
+  logger.info(`socket for user ${user.username} established`);
 
   if (session.id) {
     socket.join(session.id);
@@ -33,8 +35,8 @@ export const initSockets = (httpServer: HTTPServer) => {
   if (gameId) {
     const id = parseInt(gameId, 10);
     if (!Number.isNaN(id)) {
-      initGameSocket(socket, id, session.user.id);
-      registerGameHandlers(io, socket, id, session.user.id);
+      initGameSocket(socket, id, user.id);
+      registerGameHandlers(io, socket, id, user.id);
     }
   } else {
     socket.join(GLOBAL_ROOM);
@@ -42,7 +44,7 @@ export const initSockets = (httpServer: HTTPServer) => {
 
 
   socket.on("close", () => {
-    logger.info(`socket for user ${session.user.username} closed`);
+    logger.info(`socket for user ${user.username} closed`);
   });
 });
 
